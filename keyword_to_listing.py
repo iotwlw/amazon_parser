@@ -1,15 +1,4 @@
 # -*- coding: utf-8 -*-
-
-# python3 and pycharm on windows 7
-# 主要用于爬取亚马逊美国站宠物类目产品，其他类目未测试
-# self.keyword_list里填入要爬取的关键词，要爬取搜索页的页数（不是listing页数），一般一个搜索页包含20-40个listing
-# 默认下载到pycharm项目文件夹下listing info文件夹内的，以关键词命名的文件夹里
-# 如要爬取的关键词为dog toys，则下载到:pycharm项目文件夹/listing info/dog toys/
-# 下载的listing首图以ASIN命名
-# 下载的listing info数据存储在csv文件内，文件名是下载开始时间
-# author: larry
-# email: dg1245@qq.com
-
 import requests
 from bs4 import BeautifulSoup
 import re
@@ -23,15 +12,12 @@ class Keyword_to_listing():
     def __init__(self):
         #关键词列表，注意英文引号+英文逗号，爬取的资料保存在listing info文件夹下同名关键词文件夹里
         self.keyword_list = [
-                            "hands free dog leash",
-                            "dog toys",
-                            ]
-        #爬取搜索页的页数
-        self.max_page = 3
+            "dog id tags",
+        ]
+        #爬取页数
+        self.max_page = 2
         #每爬取一个网页后休息的时间秒数，爬取太快会导致爬虫被禁
-        #爬取一个页面耗时约1s，建议sleep_time设置为1s，所以爬取一个页面耗时约2s
-        self.sleep_time = 1
-        
+        self.sleep_time = 0
         #下面的不用修改
         self.csv_file_name = ""
         self.picture_folder = ""
@@ -66,6 +52,7 @@ class Keyword_to_listing():
             {'User-Agent': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)'}
         ]
         headers = random.choice(headers_list)
+        # print("headers: ", headers)
         china_proxies_list = [
             {'http:': 'http://123.56.169.22:3128'},
             {'http:': 'http://121.196.226.246:84'},
@@ -99,7 +86,7 @@ class Keyword_to_listing():
         ]
         # proxies = random.choice(usa_proxies_list)
         proxies = random.choice(china_proxies_list)
-        
+        # print("proxies: ", proxies)
         # r = requests.get(url, headers=headers)
         r = requests.get(url, headers=headers, proxies=proxies)
         # print("Downloading: r.status_code=", r.status_code)
@@ -112,11 +99,15 @@ class Keyword_to_listing():
 
         # soup = BeautifulSoup(r.content, 'html.parser')
         soup = BeautifulSoup(r.text.encode(r.encoding).decode('utf-8'), 'html.parser')
+        # soup = BeautifulSoup(r.read(), 'html.parser')
+        # soup = BeautifulSoup(r.content.decode('utf-8'), 'html.parser')
+        # soup = BeautifulSoup(r.content, 'html5lib')
         time.sleep(self.sleep_time)
         return soup
 
     def download_picture_by_url(self):
         print("start to download picture...")
+
         try:
             pic = requests.get(self.picture_url, timeout=10)
             picture_name = self.picture_folder + "/"+ str(self.asin) + '.jpg'
@@ -339,6 +330,7 @@ class Keyword_to_listing():
                              "qa_num": qa_num,
                              "picture_url": picture_url
                              }
+        # print(listing_info_dict)
         return listing_info_dict
 
     def keyword_to_all_listing_asin_list(self):
@@ -395,7 +387,6 @@ class Keyword_to_listing():
                         self.listing_info_dict_list.append(listing_info_dict)
                         try:
                             self.picture_url = listing_info_dict['picture_url']
-                            # 此处设置是否下载首图，不下载首图的话可以把下面一句注释掉
                             self.download_picture_by_url()
                         except:
                             pass
