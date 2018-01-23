@@ -12,30 +12,18 @@ class Keyword_placement():
     def __init__(self):
         # 这里填你要查排名的ASIN，注意英文引号，英文逗号，每行必须左对齐！
         self.asin_list = [
-            "B0743344ZD",
-            "B074SDGFD4",
-            "B074SG1YPP",
-            "B075FM7ZS9",
+            "B01E9TJMAQ",
+            "B074MM3CST",
         ]
         # 这里填你要查排名的关键词，注意英文引号，英文逗号，每行必须左对齐！
         self.keyword_list = [
-            "dog training collar",
-            "dog training collars",
-            "shock collar for dogs",
-            "shock collar",
-            "dog shock collar",
-            "dog training",
-            "hands free dog leash",
-            "bungee leash",
-            "dog running leash",
-            "hands free dog leash for running",
+            "dog ropes",
+            "dog toy ropes",
         ]
         # 选填，不填也可以的，这里填ASIN和SKU对应关系，注意英文引号，英文冒号，英文逗号，每行必须左对齐！
         self.asin_sku_dict = {
-            "B0743344ZD": "PE001-1USF1",
-            "B074SDGFD4": "PE012-1USF1",
-            "B074SG1YPP": "PE013-1USF1",
-            "B075FM7ZS9": "PE019-1USF2",
+            "B01E9TJMAQ": "产品1",
+            "B074MM3CST": "产品2",
         }
         # 这里填每个关键词搜索的最大页数
         self.max_page = 20
