@@ -53,6 +53,8 @@ class Keyword_to_listing():
         ]
         headers = random.choice(headers_list)
         # print("headers: ", headers)
+        
+        # 大部分代理IP已失效，记得自己更新为最新，效果会更好
         china_proxies_list = [
             {'http:': 'http://123.56.169.22:3128'},
             {'http:': 'http://121.196.226.246:84'},
@@ -67,6 +69,8 @@ class Keyword_to_listing():
             {'http:': 'http://114.215.103.121:8081'},
             {'http:': 'http://175.11.157.195:80'}
         ]
+        
+        # 大部分代理IP已失效，记得自己更新为最新，效果会更好
         usa_proxies_list = [
             {'http:': 'http://40.140.245.109:8080'},
             {'http:': 'http://50.116.12.78:8118'},
