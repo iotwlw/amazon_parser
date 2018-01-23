@@ -282,10 +282,10 @@ start_time = datetime.now()
 print("根据亚马逊店铺storefront的链接，获取该店铺产品的review数量星星，salesrank；")
 print("")
 
-store_url = "https://www.amazon.com/s?marketplaceID=ATVPDKIKX0DER&me=A8E7LT0GUPMN2&merchant=A8E7LT0GUPMN2&redirect=true"
-print("store_url: ")
-print(store_url)
-# store_url = "https://www.amazon.com/s?marketplaceID=ATVPDKIKX0DER&me=A294P4X9EWVXLJ&merchant=A294P4X9EWVXLJ&redirect=true"
+# store front url
+store_url = "https://www.amazon.com/s?marketplaceID=ATVPDKIKX0DER&me=A2FQ5GG01HBOZ1&merchant=A2FQ5GG01HBOZ1&redirect=true"
+print("store_url:", store_url)
+
 pages = 1
 asin_list = store_frontpage_url_to_asins(store_url, pages)
 
