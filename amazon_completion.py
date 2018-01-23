@@ -2,19 +2,7 @@ from amazon_module import amazon_module
 
 keyword_list = [
     "cat toy",
-    "cat toy ",
-    "cat laser",
-    "cat light",
-    "shock collar",
-    "training collar",
     "dog collar",
-    "cat collar",
-    "Dog Shock Collar",
-    "shock collar",
-    "dog training collar",
-    "shock collar for dogs",
-    "cat toys",
-    "laser pointer",
 ]
 
 def keyword_to_long_tail_keyword_list(keyword):
