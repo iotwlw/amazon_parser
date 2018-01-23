@@ -283,6 +283,7 @@ print("根据亚马逊店铺storefront的链接，获取该店铺产品的review
 print("")
 
 # store front url
+# 修改成你想要的店铺首页网址
 store_url = "https://www.amazon.com/s?marketplaceID=ATVPDKIKX0DER&me=A2FQ5GG01HBOZ1&merchant=A2FQ5GG01HBOZ1&redirect=true"
 print("store_url:", store_url)
 
