@@ -8,6 +8,8 @@ keyword_list = [
 long_tail_keyword_dict_list = []
 
 print("根据给定的关键词，获取亚马逊搜索框的提示词做为长尾词；")
+
+# 没有登录merchantwords付费账号，默认抓取第一条记录的数字作为搜索量
 print("获取长尾词的merchantwords搜索量，亚马逊搜索框下显示的产品数，以及两者的比值；")
 print("")
 
