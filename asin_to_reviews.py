@@ -12,8 +12,8 @@ class Asin_to_reviews():
     def __init__(self):
         # 这里填你要爬取得ASIN，注意英文引号，英文逗号，每行必须左对齐！
         self.asin_list = [
-            "B01DUWWZ9S",
-            "B07148Z1WH",
+            "B06XP6YVN4",
+            "B00196P2O8",
         ]
         # 这里填每个ASIN里review最大爬取页数
         self.max_page = 20
