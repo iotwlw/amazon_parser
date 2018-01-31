@@ -161,6 +161,8 @@ class Asin_to_reviews():
                     review_date = review.find("span", {"data-hook": "review-date"}).get_text()
                     review_body = review.find("span", {"data-hook": "review-body"}).get_text()
                     page_rank = "page" + str(page) + "-" + str(review_index + 1)
+                    profile_url_part = review.find("a", {"data-hook": "review-author"})['href']
+                    profile_url = "https://www.amazon.com" + profile_url_part
 
                     review_dict = { "page_rank": page_rank,
                                     "asin": asin,
@@ -169,6 +171,7 @@ class Asin_to_reviews():
                                     "review_author": review_author,
                                     "review_date": review_date,
                                     "review_body": review_body,
+                                    "profile_url": profile_url,
                                    }
                     print(review_dict)
                     self.reviews_dict_list.append(review_dict)
