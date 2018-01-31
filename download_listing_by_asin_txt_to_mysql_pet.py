@@ -10,7 +10,7 @@ def asin_to_listing_info(asin):
         print("asin: ", asin)
         url = "https://www.amazon.com/dp/" + asin
         soup = amazon_module.download_soup_by_url(url)
-        print(len(soup))
+        # print(len(soup))
 
         brand = " "
         try:
