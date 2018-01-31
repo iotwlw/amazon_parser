@@ -1,5 +1,5 @@
-#
-# 
+# 默认下载best seller列表pet类目的产品信息并添加到mysql数据库，大概2w-3w条数据；
+# 要修改第352行mysql数据库的用户名，密码；
 
 import pymysql
 import re
