@@ -1,27 +1,5 @@
-# abc_list = [chr(i) for i in range(0, 256)]
-# print(abc_list)
-
-# def is_prime(num):
-#     if num <= 1:
-#         return False
-#     for i in range(2, int(num**0.5)+1):
-#         if not num%i:
-#             return False
-#     return True
-#
-# # is_prime(10)
-# for j in range(1000000):
-#     if is_prime(j):
-#         print(j)
-
-
-# color_list = ['black', 'white', 'black', 'white', 'white', 'black']
-# # color_filter = "black"
-# # color_filter = "white"
-# color_filter = "black or white"
-# for index, color in enumerate(color_list):
-#     if color in color_filter:
-#         print(index+1, color)
+# 根据产品长，宽，高（单位inch），重量（单位lb），计算FBA配送费（单位$）；（亚马逊即将调整FBA运费，该计算器马上作废）
+# 修改第83行尺寸，重量信息；
 
 import math
 
@@ -108,21 +86,3 @@ height = 5.9
 weight = 1
 fba_fee = fba_fee_calc(length, width, height, weight)
 print("FBA fee: $" + str(fba_fee))
-
-
-{
-    "orderId":"114-8985947-6381866",
-    "legacyOrderItemId":"66310165735482",
-    "orderItemId":"17442876240361",
-    "asin":"B076JBM7C6",
-    "title":"Personalized Dog Collar, Custom Engraving with Pet Name and Phone Number, Adjustable Tough Nylon ID Collar, Matching Leash Available Separately (Peafowl)",
-    "merchantId":"A8E7LT0GUPMN2",
-    "quantity":1,
-    "version3.0":{
-        "customizationInfo":{
-            "surfaces":[
-                {
-                    "name":"Surface 1",
-                    "areas":[
-                        {
-                            "colorName":"111","fontFamily":"timesbd","Position":{"x":278,"y":284},"name":"Customization 2","Dimensions":{"width":106,"height":11},"label":"Line 1","fill":"#111","customizationType":"TextPrinting","text":"Cash"},{"colorName":"111","fontFamily":"timesbd","Position":{"x":272,"y":319},"name":"Customization 3","Dimensions":{"width":110,"height":13},"label":"Line 2","fill":"#111","customizationType":"TextPrinting","text":"615-516-1432"},{"colorName":"111","fontFamily":"timesbd","Position":{"x":273,"y":353},"name":"Customization 4","Dimensions":{"width":106,"height":13},"label":"Line 3（X-S is not suitable for this line）","fill":"#111","customizationType":"TextPrinting","text":"615-879-1120"},{"optionValue":"L","name":"定制 5","priceDelta":{"currency":"USD","value":0},"optionId":"1-3-3","label":"Pls Choose Size","customizationType":"Options","optionImage":"https://m.media-amazon.com/images/S/pc-vendor-gallery-prod/A8E7LT0GUPMN2/options/2017-12-12/f78d6cf4-9613-4c7d-9db9-8c4ac266e0c9.png"}]}]}},"customizationInfo":{"aspects":[{"title":"Line 1","text":{"value":"Cash"},"font":{"value":"timesbd"},"color":{"value":"#111"}},{"title":"Line 2","text":{"value":"615-516-1432"},"font":{"value":"timesbd"},"color":{"value":"#111"}},{"title":"Line 3（X-S is not suitable for this line）","text":{"value":"615-879-1120"},"font":{"value":"timesbd"},"color":{"value":"#111"}},{"title":"Pls Choose Size","text":{},"font":{},"color":{}}]},"version":"2.0"}
