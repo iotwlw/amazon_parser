@@ -23,7 +23,7 @@ stars = "all"
 all_or_media = "media_reviews_only"
 
 # thumbnail, small, medium, large
-img_size = "thumbnail"
+img_size = "medium"
 
 max_page = 5
 
