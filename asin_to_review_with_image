@@ -1,6 +1,7 @@
 # 通过asin获取review的标题，星星数，内容，图片（如果有的话），留评日期，profile_url，等等
 # 面向过程编程，只用到了函数，没有用类，结构简单，有时间再优化
 # 有问题联系我：dg1245@qq.com
+# 欢迎交流学习
 
 from amazon_module import amazon_module
 import re
