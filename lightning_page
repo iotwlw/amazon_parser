@@ -1,0 +1,51 @@
+# coding: utf-8
+
+# 需安装selenium, PhantomJS
+from selenium import webdriver
+from bs4 import BeautifulSoup
+import os
+
+driver = webdriver.PhantomJS()
+
+max_page = 2
+for page_index, page in enumerate(range(1, max_page+1)):
+    coupon_url = "https://www.amazon.com/gp/goldbox/ref=gbps_ftr_s-4_57ad_page_" + str(page) + "?gb_f_deals1=dealStates:AVAILABLE%252CWAITLIST%252CWAITLISTFULL%252CEXPIRED%252CSOLDOUT%252CUPCOMING,page:" + str(page) + ",sortOrder:BY_SCORE,dealTypes:LIGHTNING_DEAL,dealsPerPage:40&pf_rd_p=6704031e-9da5-426f-97a7-2511c61157ad&pf_rd_s=slot-4&pf_rd_t=701&pf_rd_i=gb_main&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=9G3BWWCWQ0BXQBC171ZC&ie=UTF8"
+    driver.get(coupon_url)
+
+    # 创建文件夹
+    folder = "lightning_page"
+    if not os.path.exists(folder):
+        print("***********************************")
+        print("picture folder not exist, create the folder now...")
+        os.mkdir(folder)
+        print("success to create folder")
+
+    # 下载图片
+    file_name = "coupon_page_" + str(page_index + 1) + ".png"
+    file_path = folder + "/" + file_name
+    driver.get_screenshot_as_file(file_path)
+
+    # 获取soup
+    r = driver.page_source
+    soup = BeautifulSoup(r, "html.parser")
+
+    # 获取产品列表
+    items = soup.find(id="widgetContent").find_all("div", class_="a-section")
+
+    # 循环获取每个产品信息（图片，图片url，标题）
+    for item in items:
+        try:
+            id = item['id'].strip()
+            title = item.find("span", class_="a-declarative").get_text().strip()
+            image_url = item.find("img")['src'].strip()
+            link = item.find('a', class_="a-link-normal")['href'].strip()
+            price = item.find("span", class_="a-size-medium").get_text().strip()
+            claimed = item.find("div", class_="a-column").find("span", class_="a-size-mini").get_text().strip()
+            print("page-" + str(page_index + 1), id)
+            print(title)
+            print(image_url)
+            print(link)
+            print(price)
+            print(claimed)
+        except:
+            pass
