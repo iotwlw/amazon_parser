@@ -6,17 +6,32 @@ from bs4 import BeautifulSoup
 
 driver = webdriver.PhantomJS()
 
-for page_index, page in enumerate(range(1, 4)):
+max_page = 5
+for page_index, page in enumerate(range(1, max_page+1)):
     coupon_url = "https://www.amazon.com/gp/goldbox/ref=gbps_ftr_s-4_57ad_page_" + str(page) + "?gb_f_deals1=dealStates:AVAILABLE%252CWAITLIST%252CWAITLISTFULL%252CEXPIRED%252CSOLDOUT%252CUPCOMING,page:" + str(page) + ",sortOrder:BY_SCORE,dealTypes:COUPON_DEAL,dealsPerPage:48&pf_rd_p=6704031e-9da5-426f-97a7-2511c61157ad&pf_rd_s=slot-4&pf_rd_t=701&pf_rd_i=gb_main&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=76JGE5JMA11C61ZAVR18&ie=UTF8"
     driver.get(coupon_url)
 
-    # title = driver.title
-    # driver.get_screenshot_as_file("C:/test.png")
+    # 创建文件夹
+    folder = "coupon_page_listing"
+    if not os.path.exists(folder):
+        print("***********************************")
+        print("picture folder not exist, create the folder now...")
+        os.mkdir(folder)
+        print("success to create folder")
 
+    # 下载图片
+    file_name = "coupon_page_" + str(page_index + 1) + ".png"
+    file_path = folder + "/" + file_name
+    driver.get_screenshot_as_file(file_path)
+    
+    # 获取soup
     r = driver.page_source
     soup = BeautifulSoup(r, "html.parser")
 
+    # 获取产品列表
     items = soup.find(id="widgetContent").find_all("div", class_="a-section")
+    
+    # 循环获取每个产品信息（图片，图片url，标题）
     for item in items:
         try:
             id = item['id'].strip()
