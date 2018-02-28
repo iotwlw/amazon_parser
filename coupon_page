@@ -13,7 +13,7 @@ for page_index, page in enumerate(range(1, max_page+1)):
     driver.get(coupon_url)
 
     # 创建文件夹
-    folder = "coupon_page_listing"
+    folder = "coupon_page"
     if not os.path.exists(folder):
         print("***********************************")
         print("picture folder not exist, create the folder now...")
