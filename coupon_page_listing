@@ -3,6 +3,7 @@
 # 需安装selenium, PhantomJS
 from selenium import webdriver
 from bs4 import BeautifulSoup
+import os
 
 driver = webdriver.PhantomJS()
 
