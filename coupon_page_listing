@@ -1,0 +1,31 @@
+# coding: utf-8
+
+# 需安装selenium, PhantomJS
+from selenium import webdriver
+from bs4 import BeautifulSoup
+
+driver = webdriver.PhantomJS()
+
+for page_index, page in enumerate(range(1, 4)):
+    coupon_url = "https://www.amazon.com/gp/goldbox/ref=gbps_ftr_s-4_57ad_page_" + str(page) + "?gb_f_deals1=dealStates:AVAILABLE%252CWAITLIST%252CWAITLISTFULL%252CEXPIRED%252CSOLDOUT%252CUPCOMING,page:" + str(page) + ",sortOrder:BY_SCORE,dealTypes:COUPON_DEAL,dealsPerPage:48&pf_rd_p=6704031e-9da5-426f-97a7-2511c61157ad&pf_rd_s=slot-4&pf_rd_t=701&pf_rd_i=gb_main&pf_rd_m=ATVPDKIKX0DER&pf_rd_r=76JGE5JMA11C61ZAVR18&ie=UTF8"
+    driver.get(coupon_url)
+
+    # title = driver.title
+    # driver.get_screenshot_as_file("C:/test.png")
+
+    r = driver.page_source
+    soup = BeautifulSoup(r, "html.parser")
+
+    items = soup.find(id="widgetContent").find_all("div", class_="a-section")
+    for item in items:
+        try:
+            id = item['id'].strip()
+            title = item.find("span", class_="a-declarative").get_text().strip()
+            image_url = item.find("img")['src'].strip()
+            link = item.find('a', class_="a-link-normal")['href'].strip()
+            print("page-" + str(page_index + 1), id)
+            print(title)
+            print(image_url)
+            print(link)
+        except:
+            pass
