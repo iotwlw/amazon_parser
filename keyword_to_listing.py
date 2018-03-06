@@ -88,8 +88,8 @@ class Keyword_to_listing():
             {'http:': 'http://191.96.51.224:8080'},
             {'http:': 'http://45.55.157.204:80'}
         ]
-        # proxies = random.choice(usa_proxies_list)
-        proxies = random.choice(china_proxies_list)
+        proxies = random.choice(usa_proxies_list)
+        # proxies = random.choice(china_proxies_list)
         # print("proxies: ", proxies)
         # r = requests.get(url, headers=headers)
         r = requests.get(url, headers=headers, proxies=proxies)
@@ -150,7 +150,7 @@ class Keyword_to_listing():
         url = "https://www.amazon.com/dp/" + asin
         print("url: ", url)
 
-        soup = self.download_soup_by_url(url)
+        soup = amazon_module.download_soup_by_url(url)
 
         brand = ""
         try:
@@ -345,7 +345,7 @@ class Keyword_to_listing():
         pages_urls_list.append(first_page_url)
         page = 1
         while page <= self.max_page:
-            soup = self.download_soup_by_url(pages_urls_list[-1])
+            soup = amazon_module.download_soup_by_url(pages_urls_list[-1])
             try:
                 if soup.find(id="pagnNextLink")["href"]:
                     next_page_url_part2 = soup.find(id="pagnNextLink")["href"]
