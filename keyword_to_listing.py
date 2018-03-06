@@ -7,17 +7,18 @@ import os
 import csv
 from datetime import datetime
 import time
+from amazon_module import amazon_module
 
 class Keyword_to_listing():
     def __init__(self):
         #关键词列表，注意英文引号+英文逗号，爬取的资料保存在listing info文件夹下同名关键词文件夹里
         self.keyword_list = [
-            "dog id tags",
+            "men shoes",
         ]
         #爬取页数
-        self.max_page = 2
+        self.max_page = 5
         #每爬取一个网页后休息的时间秒数，爬取太快会导致爬虫被禁
-        self.sleep_time = 0
+        self.sleep_time = 1
         #下面的不用修改
         self.csv_file_name = ""
         self.picture_folder = ""
@@ -53,8 +54,6 @@ class Keyword_to_listing():
         ]
         headers = random.choice(headers_list)
         # print("headers: ", headers)
-        
-        # 大部分代理IP已失效，记得自己更新为最新，效果会更好
         china_proxies_list = [
             {'http:': 'http://123.56.169.22:3128'},
             {'http:': 'http://121.196.226.246:84'},
@@ -69,8 +68,6 @@ class Keyword_to_listing():
             {'http:': 'http://114.215.103.121:8081'},
             {'http:': 'http://175.11.157.195:80'}
         ]
-        
-        # 大部分代理IP已失效，记得自己更新为最新，效果会更好
         usa_proxies_list = [
             {'http:': 'http://40.140.245.109:8080'},
             {'http:': 'http://50.116.12.78:8118'},
@@ -96,13 +93,14 @@ class Keyword_to_listing():
         # print("Downloading: r.status_code=", r.status_code)
         # print("url: ", url)
         if r.status_code != 200:
-            headers = random.choice(headers_list)
-            proxies = random.choice(china_proxies_list)
-            r = requests.get(url, headers=headers, proxies=proxies)
+            # headers = random.choice(headers_list)
+            # proxies = random.choice(china_proxies_list)
+            r = requests.get(url, headers=headers)
+            # r = requests.get(url, headers=headers, proxies=proxies)
             # print("Downloading: r.status_code=", r.status_code)
 
-        # soup = BeautifulSoup(r.content, 'html.parser')
-        soup = BeautifulSoup(r.text.encode(r.encoding).decode('utf-8'), 'html.parser')
+        soup = BeautifulSoup(r.content, 'html.parser')
+        # soup = BeautifulSoup(r.text.encode(r.encoding).decode('utf-8'), 'html.parser')
         # soup = BeautifulSoup(r.read(), 'html.parser')
         # soup = BeautifulSoup(r.content.decode('utf-8'), 'html.parser')
         # soup = BeautifulSoup(r.content, 'html5lib')
@@ -239,6 +237,31 @@ class Keyword_to_listing():
         except:
             pass
 
+        fbt_asin_1 = ""
+        fbt_asin_2 = ""
+        try:
+            uls = soup.find("div", id="sims-fbt-content").find("ul")
+            # print("FBT:", uls)
+            fbt_list = []
+            for li in uls:
+                if li.find("a"):
+                    try:
+                        link = li.find('a')['href']
+                        fbt_asin = re.findall(r"dp/(.*?)/ref", link)[0]
+                        # print(asin)
+                        fbt_list.append(fbt_asin)
+                    except:
+                        pass
+            if fbt_list[0]:
+                fbt_asin_1 = fbt_list[0]
+            if fbt_list[1]:
+                fbt_asin_2 = fbt_list[1]
+        except:
+            pass
+
+        print("fbt_asin_1:", fbt_asin_1)
+        print("fbt_asin_2:", fbt_asin_2)
+
         description = ""
         try:
             if soup.find(id="productDescription"):
@@ -327,6 +350,8 @@ class Keyword_to_listing():
                              "sold_by": sold_by,
                              "how_many_sellers": how_many_sellers,
                              "bullets": bullets_list,
+                             "fbt_asin_1": fbt_asin_1,
+                             "fbt_asin_2": fbt_asin_2,
                              "description": description,
                              "salesrank": salesrank,
                              "review_num": review_num,
@@ -429,5 +454,7 @@ class Keyword_to_listing():
         print(str(how_many_seconds.total_seconds()) + "seconds")
 
 #main function
+print("根据给定的ASIN，获取listing详情页的信息，并下载首图")
+print("")
 keyword_to_listing = Keyword_to_listing()
 keyword_to_listing.get_listing_info()
