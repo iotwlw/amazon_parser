@@ -94,9 +94,9 @@ def download_soup_by_url(url):
                 {'http:': 'http://45.55.157.204:80'}
     ]
     # proxies = random.choice(usa_proxies_list)
-    proxies = random.choice(china_proxies_list)
-    # r = requests.get(url, headers=headers)
-    r = requests.get(url, headers=headers, proxies=proxies)
+    # proxies = random.choice(china_proxies_list)
+    r = requests.get(url, headers=headers)
+    # r = requests.get(url, headers=headers, proxies=proxies)
     # print("Downloading: r.status_code=", r.status_code)
     # print("url: ", url)
 
