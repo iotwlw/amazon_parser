@@ -7,14 +7,18 @@ from datetime import datetime
 import requests
 import os
 
-
-# pip3 install pymysql
+# 记得先安装pymysql， pip3 install pymysql
+# 默认会新建图片文件夹，文件名默认是关键词（关键词内空格换成下划线）
+# 记得修改mysql用户名，密码
+# mysql里默认下载到amazon_db数据库，表名是关键词（关键词内空格换成下划线） + "_table"
 
 # change them to yours
 keyword = "men shoes"
 max_page = 5
 mysql_user = "root"
 mysql_password = "password"
+mysql_database = "amazon_db"
+mysql_table = "_".join(keyword.split()) + "_table"
 
 def download_picture_by_url(picture_url, picture_folder, asin):
     print("start to download picture...")
@@ -426,7 +430,6 @@ def keyword_to_asin_list(keyword, max_page):
             pass
 
 
-
 # do not change
 keyword_with_underline = "_".join(keyword.split())
 
@@ -445,7 +448,7 @@ conn = pymysql.connect("localhost", mysql_user, mysql_password,)
 cursor = conn.cursor()
 
 # create datebase
-db_name = "amazon_db"
+db_name = mysql_database
 try:
     create_db_sql = "create database " + db_name
     print(create_db_sql)
@@ -462,7 +465,7 @@ except:
     print("fail to use database: ", db_name)
 
 # create table
-table_name = keyword_with_underline + "_table"
+table_name = mysql_table
 print(table_name)
 try:
     create_table_sql = "create table " + table_name + " (asin char(10), insert_datetime varchar(30), url char(50), brand char(50), badge char(50), title char(250), variation_name char(250), price char(10), sold_by char(100), how_many_sellers char(100), bullet_1 varchar(3000), bullet_2 varchar(3000), bullet_3 varchar(3000), bullet_4 varchar(3000), bullet_5 varchar(3000), description varchar(3000), salesrank char(10), review_num char(10), review_value char(10), qa_num char(10), picture_url char(100) )"
