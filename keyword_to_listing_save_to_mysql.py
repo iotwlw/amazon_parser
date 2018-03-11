@@ -218,7 +218,7 @@ def asin_to_listing_info(asin):
         # print(listing_info_dict)
         return listing_info_dict
 
-def insert_data_to_mysql(asin_dict, table_name):
+def insert_data_to_mysql(asin_dict, table_name, cursor, conn):
     try:
         try:
             asin = asin_dict["asin"]
@@ -352,17 +352,21 @@ def insert_data_to_mysql(asin_dict, table_name):
             " (asin, insert_datetime, url, brand, badge, title, variation_name, price, sold_by, how_many_sellers, bullet_1, bullet_2, bullet_3, bullet_4, bullet_5, description, salesrank, review_num, review_value, qa_num, picture_url ) \
             VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' ) " % \
             (asin, insert_datetime, url, brand, badge, title, variation_name, price, sold_by, how_many_sellers, bullet_1, bullet_2, bullet_3, bullet_4, bullet_5, description, salesrank, review_num, review_value, qa_num, picture_url )
-
-            cursor.execute(insert_into_sql)
+            print("a")
             print(cursor)
+            cursor.execute(insert_into_sql)
+            print("b")
+            print(cursor)
+            print("c")
             conn.commit()
+            print("d")
             print("success to insert asin_dict to mysql")
         except:
-            pass
+            print("fail to insert asin_dict to mysql!!!!!!!!!!!")
     except:
         print("fail to insert asin_dict to mysql!")
 
-def keyword_to_asin_list(keyword, max_page):
+def keyword_to_asin_list(keyword, max_page, table_name, cursor, conn):
     base_url = "https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords="
     keyword_with_underline = "_".join(keyword.split())
     keyword_with_plus = "+".join(keyword.split())
@@ -416,8 +420,8 @@ def keyword_to_asin_list(keyword, max_page):
                     listing_info_dict["sponsored_or_natural_rank"] = sponsored_or_natural_rank
                     listing_info_dict["is_prime"] = is_prime
 
-                    table_name = keyword_with_underline
-                    insert_data_to_mysql(listing_info_dict, table_name)
+
+                    insert_data_to_mysql(listing_info_dict, table_name, cursor, conn)
                     try:
                         picture_url = listing_info_dict['picture_url']
                         picture_folder = keyword_with_underline
@@ -477,7 +481,7 @@ except:
 
 # keyword_to_asin_list
 try:
-    keyword_to_asin_list(keyword, max_page)
+    keyword_to_asin_list(keyword, max_page, table_name, cursor, conn)
 except:
     print("fail")
 
