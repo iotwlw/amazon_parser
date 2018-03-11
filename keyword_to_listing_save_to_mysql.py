@@ -14,8 +14,8 @@ import os
 
 # change them to yours
 keyword = "men shoes"
-max_page = 5
-mysql_user = "root"
+max_page = 3
+mysql_user = "user"
 mysql_password = "password"
 mysql_database = "amazon_db"
 mysql_table = "_".join(keyword.split()) + "_table"
@@ -352,17 +352,12 @@ def insert_data_to_mysql(asin_dict, table_name, cursor, conn):
             " (asin, insert_datetime, url, brand, badge, title, variation_name, price, sold_by, how_many_sellers, bullet_1, bullet_2, bullet_3, bullet_4, bullet_5, description, salesrank, review_num, review_value, qa_num, picture_url ) \
             VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' ) " % \
             (asin, insert_datetime, url, brand, badge, title, variation_name, price, sold_by, how_many_sellers, bullet_1, bullet_2, bullet_3, bullet_4, bullet_5, description, salesrank, review_num, review_value, qa_num, picture_url )
-            print("a")
-            print(cursor)
             cursor.execute(insert_into_sql)
-            print("b")
             print(cursor)
-            print("c")
             conn.commit()
-            print("d")
             print("success to insert asin_dict to mysql")
         except:
-            print("fail to insert asin_dict to mysql!!!!!!!!!!!")
+            print("fail to insert asin_dict to mysql!")
     except:
         print("fail to insert asin_dict to mysql!")
 
