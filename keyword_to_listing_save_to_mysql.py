@@ -15,9 +15,16 @@ import os
 # change them to yours
 keyword = "men shoes"
 max_page = 3
-mysql_user = "user"
-mysql_password = "password"
-mysql_database = "amazon_db"
+
+db_config = {
+    'host': 'localhost',
+    'port': '3306',
+    'username': 'user',
+    'password': 'password',
+    'database': 'amazon_db',
+    'charset': 'utf8'
+}
+
 mysql_table = "_".join(keyword.split()) + "_table"
 
 def download_picture_by_url(picture_url, picture_folder, asin):
@@ -46,7 +53,7 @@ def asin_to_listing_info(asin):
                 brand = soup.find(id="brand").get_text().strip()
         except:
             pass
-        print("brand: ", brand)
+        print("brand:", brand)
 
         badge = ""
         try:
@@ -54,7 +61,7 @@ def asin_to_listing_info(asin):
                badge = " ".join(soup.find("a", class_="badge-link").get_text().strip().split())
         except:
             pass
-        print("badge: ", badge)
+        print("badge:", badge)
 
         title = ""
         try:
@@ -62,7 +69,7 @@ def asin_to_listing_info(asin):
                 title = soup.find(id="productTitle").get_text().strip()
         except:
             pass
-        print("title: ", title)
+        print("title:", title)
 
         variation_name = " "
         try:
@@ -88,7 +95,7 @@ def asin_to_listing_info(asin):
                 price = soup.find(id="priceblock_ourprice").get_text().strip()
         except:
             pass
-        print("price: ", price)
+        print("price:", price)
 
         sold_by = " "
         try:
@@ -97,7 +104,7 @@ def asin_to_listing_info(asin):
                 sold_by = " ".join(soup.find(id="merchant-info").get_text().strip().split())
         except:
             pass
-        print("sold_by: ", sold_by)
+        print("sold_by:", sold_by)
 
         how_many_sellers = " "
         try:
@@ -105,13 +112,13 @@ def asin_to_listing_info(asin):
                 how_many_sellers = soup.find(id="olp_feature_div").find("a").get_text().strip()
         except:
             pass
-        print("how_many_sellers: ", how_many_sellers )
+        print("how_many_sellers:", how_many_sellers )
 
         bullets_list = []
         try:
             if  soup.find("div", id="feature-bullets"):
                 bullets_contents = soup.find("div", id="feature-bullets").find_all("span", class_="a-list-item")
-                print("bullets: ")
+                print("bullets:")
                 for bullets_content in bullets_contents:
                     print(bullets_content.get_text().strip())
                     #toys
@@ -130,7 +137,7 @@ def asin_to_listing_info(asin):
             description = " ".join(description.split())
         except:
             pass
-        print("description: ", description)
+        print("description:", description)
 
         salesrank = " "
         try:
@@ -154,7 +161,7 @@ def asin_to_listing_info(asin):
                             salesrank = salesrank.replace('#', '')
         except:
             pass
-        print("salesrank: ", salesrank)
+        print("salesrank:", salesrank)
 
         review_num = " "
         try:
@@ -162,7 +169,7 @@ def asin_to_listing_info(asin):
                 review_num = soup.find(id="acrCustomerReviewText").get_text().split()[0].strip()
         except:
             pass
-        print("review_num: ", review_num)
+        print("review_num:", review_num)
 
         review_value = " "
         try:
@@ -173,7 +180,7 @@ def asin_to_listing_info(asin):
                 review_value = review_value.strip()
         except:
             pass
-        print("review_value: ", review_value)
+        print("review_value:", review_value)
 
         qa_num = " "
         try:
@@ -181,7 +188,7 @@ def asin_to_listing_info(asin):
                 qa_num = soup.find(id="askATFLink").get_text().split()[0].strip()
         except:
             pass
-        print("qa_num: ", qa_num)
+        print("qa_num:", qa_num)
 
         picture_url = " "
         try:
@@ -195,7 +202,7 @@ def asin_to_listing_info(asin):
             picture_url = picture_urls_list[0]
         except:
             pass
-        print("picture_url: ", picture_url)
+        print("picture_url:", picture_url)
 
         listing_info_dict = {
                              "asin": asin,
@@ -215,54 +222,55 @@ def asin_to_listing_info(asin):
                              "qa_num": qa_num,
                              "picture_url": picture_url
                              }
-        # print(listing_info_dict)
+
         return listing_info_dict
 
-def insert_data_to_mysql(asin_dict, table_name, cursor, conn):
+def insert_data_to_mysql(asin_dict, table_name, conn):
+    print("insert_data_to_mysql")
     try:
         try:
             asin = asin_dict["asin"]
-            print(asin)
+            asin = pymysql.escape_string(asin)
         except:
             pass
         try:
             url = asin_dict["url"]
-            print(url)
+            url = pymysql.escape_string(url)
         except:
             pass
         try:
             brand = asin_dict["brand"]
             brand = pymysql.escape_string(brand)
-            print(brand)
         except:
             pass
         try:
             badge = asin_dict["badge"]
             badge = pymysql.escape_string(badge)
-            print("bage: ", badge)
         except:
             pass
         try:
             title = asin_dict["title"]
             title = pymysql.escape_string(title)
-            print("title: ", title)
         except:
             pass
         try:
             variation_name = asin_dict["variation_name"]
+            variation_name = " ".join(variation_name.split())
             variation_name = pymysql.escape_string(variation_name)
             print(variation_name)
         except:
             pass
+
+        price = " "
         try:
             price = asin_dict["price"]
-            print(price)
+            price = str(price)
+            price = pymysql.escape_string(price)
         except:
             pass
         try:
             sold_by = asin_dict["sold_by"]
             sold_by = pymysql.escape_string(sold_by)
-            print(sold_by)
         except:
             pass
         try:
@@ -272,13 +280,17 @@ def insert_data_to_mysql(asin_dict, table_name, cursor, conn):
             pass
         try:
             bullets = asin_dict["bullets"]
-            # print(bullets)
 
             bullet_1 = " "
             bullet_2 = " "
             bullet_3 = " "
             bullet_4 = " "
             bullet_5 = " "
+            bullet_6 = " "
+            bullet_7 = " "
+            bullet_8 = " "
+            bullet_9 = " "
+            bullet_10 = " "
             if bullets:
                 try:
                     bullet_1 = bullets[0]
@@ -305,63 +317,81 @@ def insert_data_to_mysql(asin_dict, table_name, cursor, conn):
                     bullet_5 = pymysql.escape_string(bullet_5)
                 except:
                     pass
+                try:
+                    bullet_6 = bullets[5]
+                    bullet_6 = pymysql.escape_string(bullet_6)
+                except:
+                    pass
+                try:
+                    bullet_7 = bullets[6]
+                    bullet_7 = pymysql.escape_string(bullet_7)
+                except:
+                    pass
+                try:
+                    bullet_8 = bullets[7]
+                    bullet_8 = pymysql.escape_string(bullet_8)
+                except:
+                    pass
+                try:
+                    bullet_9 = bullets[8]
+                    bullet_9 = pymysql.escape_string(bullet_9)
+                except:
+                    pass
+                try:
+                    bullet_10 = bullets[9]
+                    bullet_10 = pymysql.escape_string(bullet_10)
+                except:
+                    pass
         except:
             pass
 
-        print("bullet_1: ", bullet_1)
-        print("bullet_2: ", bullet_2)
-        print("bullet_3: ", bullet_3)
-        print("bullet_4: ", bullet_4)
-        print("bullet_5: ", bullet_5)
         try:
             description = asin_dict["description"]
+            description = " ".join(description.split())
             description = pymysql.escape_string(description)
-            print(description)
         except:
             pass
         try:
             salesrank = asin_dict["salesrank"]
-            print(salesrank)
+            salesrank = pymysql.escape_string(salesrank)
         except:
             pass
         try:
             review_num = asin_dict["review_num"]
-            print(review_num)
+            review_num = pymysql.escape_string(review_num)
         except:
             pass
         try:
             review_value =asin_dict["review_value"]
-            print(review_value)
+            review_value = pymysql.escape_string(review_value)
         except:
             pass
         try:
             qa_num = asin_dict["qa_num"]
-            print(qa_num)
         except:
             pass
         try:
             picture_url = asin_dict["picture_url"]
-            print(picture_url)
         except:
             pass
         try:
             insert_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            insert_datetime = str(insert_datetime)
             print("insert_datetime: ", insert_datetime)
 
-            insert_into_sql = "INSERT INTO " + table_name + \
-            " (asin, insert_datetime, url, brand, badge, title, variation_name, price, sold_by, how_many_sellers, bullet_1, bullet_2, bullet_3, bullet_4, bullet_5, description, salesrank, review_num, review_value, qa_num, picture_url ) \
-            VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' ) " % \
-            (asin, insert_datetime, url, brand, badge, title, variation_name, price, sold_by, how_many_sellers, bullet_1, bullet_2, bullet_3, bullet_4, bullet_5, description, salesrank, review_num, review_value, qa_num, picture_url )
-            cursor.execute(insert_into_sql)
-            print(cursor)
-            conn.commit()
-            print("success to insert asin_dict to mysql")
+            with conn.cursor() as cursor:
+                insert_into_sql = "INSERT INTO " + table_name + " (asin, insert_datetime, url, brand, badge, title, variation_name, price, sold_by, how_many_sellers, bullet_1, bullet_2, bullet_3, bullet_4, bullet_5, bullet_6, bullet_7, bullet_8, bullet_9, bullet_10, description, salesrank, review_num, review_value, qa_num, picture_url) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s') "
+                data = (asin, insert_datetime, url, brand, badge, title, variation_name, price, sold_by, how_many_sellers, bullet_1, bullet_2, bullet_3, bullet_4, bullet_5, bullet_6, bullet_7, bullet_8, bullet_9, bullet_10, description, salesrank, review_num, review_value, qa_num, picture_url)
+                cursor.execute(insert_into_sql % data )
+                conn.commit()
+                print("success to insert asin_dict to mysql")
         except:
             print("fail to insert asin_dict to mysql!")
     except:
-        print("fail to insert asin_dict to mysql!")
+        print("fail to insert asin_dict to mysql!!")
 
-def keyword_to_asin_list(keyword, max_page, table_name, cursor, conn):
+def keyword_to_asin_list(keyword, max_page, table_name, conn):
+    print("keyword_to_asin_list is running...")
     base_url = "https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords="
     keyword_with_underline = "_".join(keyword.split())
     keyword_with_plus = "+".join(keyword.split())
@@ -415,8 +445,11 @@ def keyword_to_asin_list(keyword, max_page, table_name, cursor, conn):
                     listing_info_dict["sponsored_or_natural_rank"] = sponsored_or_natural_rank
                     listing_info_dict["is_prime"] = is_prime
 
+                    try:
+                        insert_data_to_mysql(listing_info_dict, table_name, conn)
+                    except:
+                        pass
 
-                    insert_data_to_mysql(listing_info_dict, table_name, cursor, conn)
                     try:
                         picture_url = listing_info_dict['picture_url']
                         picture_folder = keyword_with_underline
@@ -443,11 +476,11 @@ except:
     print("fail to create picture folder")
 
 # change "root", "password"
-conn = pymysql.connect("localhost", mysql_user, mysql_password,)
+conn = pymysql.connect(db_config['host'], db_config['username'], db_config['password'],)
 cursor = conn.cursor()
 
 # create datebase
-db_name = mysql_database
+db_name = db_config['database']
 try:
     create_db_sql = "create database " + db_name
     print(create_db_sql)
@@ -461,22 +494,22 @@ try:
     print(use_db_sql)
     cursor.execute(use_db_sql)
 except:
-    print("fail to use database: ", db_name)
+    print("fail to use database:", db_name)
 
 # create table
 table_name = mysql_table
 print(table_name)
 try:
-    create_table_sql = "create table " + table_name + " (asin char(10), insert_datetime varchar(30), url char(50), brand char(50), badge char(50), title char(250), variation_name char(250), price char(10), sold_by char(100), how_many_sellers char(100), bullet_1 varchar(3000), bullet_2 varchar(3000), bullet_3 varchar(3000), bullet_4 varchar(3000), bullet_5 varchar(3000), description varchar(3000), salesrank char(10), review_num char(10), review_value char(10), qa_num char(10), picture_url char(100) )"
+    create_table_sql = "create table " + table_name + " (asin char(10), insert_datetime char(30), url char(100), brand char(50), badge char(50), title varchar(500), variation_name varchar(250), price char(50), sold_by char(100), how_many_sellers char(100), bullet_1 varchar(3000), bullet_2 varchar(3000), bullet_3 varchar(3000), bullet_4 varchar(3000), bullet_5 varchar(3000), bullet_6 varchar(3000), bullet_7 varchar(3000), bullet_8 varchar(3000), bullet_9 varchar(3000), bullet_10 varchar(3000), description varchar(9000), salesrank char(10), review_num char(10), review_value char(10), qa_num char(10), picture_url char(100) )"
     print(create_table_sql)
     cursor.execute(create_table_sql)
     print(cursor)
 except:
-    print("fail to create table: ", table_name)
+    print("fail to create table:", table_name)
 
 # keyword_to_asin_list
 try:
-    keyword_to_asin_list(keyword, max_page, table_name, cursor, conn)
+    keyword_to_asin_list(keyword, max_page, table_name, conn)
 except:
     print("fail")
 
