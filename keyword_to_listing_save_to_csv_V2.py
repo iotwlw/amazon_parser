@@ -11,8 +11,8 @@ class Keyword_to_listing():
     def __init__(self):
 
         self.keyword_list = [
-            "personalized dog collar",
-            "personalized necklace",
+            "dog",
+            "cat",
         ]
         self.max_page = 2
         self.csv_folder = ""
