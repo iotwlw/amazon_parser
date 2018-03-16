@@ -7,15 +7,12 @@ import os
 import csv
 
 
-# change them to yours
-# keyword = "cat"
-# max_page = 3
 
-keyword_list = {
+keyword_list = [
     "cat",
     "dog",
     "rabbit",
-}
+]
 max_page = 3
 
 
@@ -393,13 +390,7 @@ def keyword_to_asin_list(keyword, max_page, csv_folder, csv_file_name, picture_f
             pass
 
 
-## keyword_to_asin_list
-# try:
-#     keyword_to_asin_list(keyword, max_page, csv_folder, csv_file_name, picture_folder)
-# except:
-#     print("fail")
-
-# keyword_list_to_asin_list
+# main
 try:
     for keyword in keyword_list:
         try:
