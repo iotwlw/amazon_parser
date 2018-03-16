@@ -8,21 +8,17 @@ import csv
 
 
 # change them to yours
-keyword = "cat"
-max_page = 3
-
-# keyword_list = {
-#     "cat",
-#     "dog",
-#     "rabbit",
-# }
+# keyword = "cat"
 # max_page = 3
 
-# don't change
-keyword_with_underline = "_".join(keyword.split())
-csv_folder = "listing/" + keyword_with_underline + "/"
-csv_file_name = keyword_with_underline + ".csv"
-picture_folder = csv_folder + "pictures/"
+keyword_list = {
+    "cat",
+    "dog",
+    "rabbit",
+}
+max_page = 3
+
+
 
 
 def listing_info_dict_to_csv_file(listing_info_dict, csv_folder, csv_file_name):
@@ -417,18 +413,22 @@ except:
 
 
 # keyword_to_asin_list
-try:
-    keyword_to_asin_list(keyword, max_page, csv_folder, csv_file_name, picture_folder)
-except:
-    print("fail")
-    
-# keyword_list_to_asin_list
 # try:
-#     for keyword in keyword_list:
-#        try:
-#             keyword_to_asin_list(keyword, max_page, csv_folder, csv_file_name, picture_folder)
-#         except:
-#             print("fail")
+#     keyword_to_asin_list(keyword, max_page, csv_folder, csv_file_name, picture_folder)
 # except:
 #     print("fail")
+
+# keyword_list_to_asin_list
+try:
+    for keyword in keyword_list:
+        try:
+            keyword_with_underline = "_".join(keyword.split())
+            csv_folder = "listing/" + keyword_with_underline + "/"
+            csv_file_name = keyword_with_underline + ".csv"
+            picture_folder = csv_folder + "pictures/"
+            keyword_to_asin_list(keyword, max_page, csv_folder, csv_file_name, picture_folder)
+        except:
+            print("fail")
+except:
+    print("fail")
 
