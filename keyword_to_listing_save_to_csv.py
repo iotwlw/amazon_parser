@@ -393,26 +393,7 @@ def keyword_to_asin_list(keyword, max_page, csv_folder, csv_file_name, picture_f
             pass
 
 
-# create csv folder
-try:
-    if not os.path.exists(csv_folder):
-        print(csv_folder)
-        os.makedirs(csv_folder)
-        print("success to create csv_folder folder")
-except:
-    print("fail to create csv_folder folder")
-
- # create picture folder
-try:
-    if not os.path.exists(picture_folder):
-        print(picture_folder)
-        os.makedirs(picture_folder)
-        print("success to create picture folder")
-except:
-    print("fail to create picture folder")
-
-
-# keyword_to_asin_list
+## keyword_to_asin_list
 # try:
 #     keyword_to_asin_list(keyword, max_page, csv_folder, csv_file_name, picture_folder)
 # except:
@@ -426,6 +407,25 @@ try:
             csv_folder = "listing/" + keyword_with_underline + "/"
             csv_file_name = keyword_with_underline + ".csv"
             picture_folder = csv_folder + "pictures/"
+            
+            # create csv folder
+            try:
+                if not os.path.exists(csv_folder):
+                    print(csv_folder)
+                    os.makedirs(csv_folder)
+                    print("success to create csv_folder folder")
+            except:
+                print("fail to create csv_folder folder")
+            
+             # create picture folder
+            try:
+                if not os.path.exists(picture_folder):
+                    print(picture_folder)
+                    os.makedirs(picture_folder)
+                    print("success to create picture folder")
+            except:
+                print("fail to create picture folder")
+            
             keyword_to_asin_list(keyword, max_page, csv_folder, csv_file_name, picture_folder)
         except:
             print("fail")
