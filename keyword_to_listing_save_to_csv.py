@@ -11,6 +11,13 @@ import csv
 keyword = "cat"
 max_page = 3
 
+# keyword_list = {
+#     "cat",
+#     "dog",
+#     "rabbit",
+# }
+# max_page = 3
+
 # don't change
 keyword_with_underline = "_".join(keyword.split())
 csv_folder = "listing/" + keyword_with_underline + "/"
@@ -414,4 +421,14 @@ try:
     keyword_to_asin_list(keyword, max_page, csv_folder, csv_file_name, picture_folder)
 except:
     print("fail")
+    
+# keyword_list_to_asin_list
+# try:
+#     for keyword in keyword_list:
+#        try:
+#             keyword_to_asin_list(keyword, max_page, csv_folder, csv_file_name, picture_folder)
+#         except:
+#             print("fail")
+# except:
+#     print("fail")
 
