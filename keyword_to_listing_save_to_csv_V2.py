@@ -221,6 +221,7 @@ class Keyword_to_listing():
                 description = " ".join(description.split())
             except:
                 pass
+            description = re.sub(r"(Product Description.*; } )", "", description)
             print("description:", description)
 
             salesrank = " "
