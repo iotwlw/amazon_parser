@@ -1,0 +1,51 @@
+# coding: utf-8
+
+import re
+import requests
+from amazon_module import amazon_module
+
+ip_port_list = []
+
+# read ip_port from ip.txt
+try:
+    with open("ip.txt", "r") as f:
+        for line in f.readlines():
+            ip_port_list.append(line.strip() + "\n")
+        f.close()
+except:
+    pass
+
+# get ip_port from www.data5u.com
+url_list = [
+    "http://www.data5u.com/free/gwgn/index.shtml",
+    # "http://www.data5u.com/free/gngn/index.shtml",
+]
+
+for url in url_list:
+    soup = amazon_module.download_soup_by_url(url)
+
+    try:
+        uls = soup.find_all("ul", class_="l2")
+        for ul in uls:
+            ip = ul.find("li").get_text().strip()
+            
+            # port is not correct, not solved yet
+            port = ul.find("li", class_="port").get_text().strip()
+            ip_port = ip + ":" + port
+            print(ip_port)
+
+            ip_port_list.append(ip_port + "\n")
+    except:
+        pass
+
+
+# test ip_port
+
+
+# remove extra ip_port
+ip_port_list = list(set(ip_port_list))
+
+# write to ip.txt
+# port is not correct, not solved yet
+with open("ip.txt", "w") as f:
+    f.writelines(ip_port_list)
