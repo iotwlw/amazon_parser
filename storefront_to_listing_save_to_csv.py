@@ -255,12 +255,23 @@ class Storefront_to_listing():
                 pass
             print("bullets_list:", bullets_list)
 
+            a_plus_page = " "
+            try:
+                if soup.find(id="aplus"):
+                    a_plus_page = soup.find(id="aplus").get_text()
+                a_plus_page = " ".join(a_plus_page.split())
+            except:
+                pass
+            a_plus_page = re.sub(r"(Product Description.*; } )", "", a_plus_page)
+            a_plus_page = re.sub(r"(From the manufacturer.*; } )", "", a_plus_page)
+            a_plus_page = a_plus_page.replace("View larger ", "")
+            a_plus_page = a_plus_page.replace("Read more ", "")
+            print("a_plus_page:", a_plus_page)
+
             description = " "
             try:
                 if soup.find(id="productDescription"):
                     description = soup.find(id="productDescription").get_text()
-                if soup.find(id="aplus"):
-                    description = soup.find(id="aplus").get_text()
                 description = " ".join(description.split())
             except:
                 pass
@@ -358,6 +369,7 @@ class Storefront_to_listing():
                 "bullet_8": bullet_8,
                 "bullet_9": bullet_9,
                 "bullet_10": bullet_10,
+                "a_plus_page": a_plus_page,
                 "description": description,
                 "salesrank": salesrank,
                 "review_num": review_num,
@@ -423,4 +435,3 @@ class Storefront_to_listing():
 #main function
 storefront_to_listing = Storefront_to_listing()
 storefront_to_listing.start()
-
