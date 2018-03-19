@@ -22,6 +22,7 @@ class Storefront_to_listing():
         self.picture_url = ""
         self.asin = ""
         self.listing_info_dict = dict()
+        self.best_seller_badge = " "
 
     def store_url_to_asin_list(self, store_url):
         soup = amazon_module.download_soup_by_url(store_url)
@@ -33,6 +34,17 @@ class Storefront_to_listing():
             self.listing_info_dict = self.asin_to_listing_info()
             self.listing_info_dict_to_csv_file()
             asin_list.append(self.asin)
+
+            # best seller badge
+            self.best_seller_badge = ""
+            try:
+                best_seller_badge_id = "BESTSELLER_" + self.asin
+                best_seller_badge = li.find(id=best_seller_badge_id).get_text()
+                best_seller_badge = " ".join(best_seller_badge.split())
+                self.best_seller_badge = best_seller_badge.replace("Best Seller", "Best Seller ", 1)
+                print("best_seller_badge:", self.best_seller_badge)
+            except:
+                pass
         return asin_list
 
     def storefront_url_to_store_url_list(self):
@@ -118,8 +130,9 @@ class Storefront_to_listing():
 
             badge = " "
             try:
-                if soup.find("a", class_="badge-link"):
-                   badge = " ".join(soup.find("a", class_="badge-link").get_text().strip().split())
+                if soup.find(id="acBadge_feature_div").find("div", class_="ac-badge-wrapper"):
+                    badge = " ".join(soup.find(id="acBadge_feature_div").find("div", class_="ac-badge-wrapper").get_text().strip().split())
+                    badge = badge.replace("Amazon's Choice recommends highly rated, well-priced products available to ship immediately. ", "", 1)
             except:
                 pass
             print("badge:", badge)
@@ -253,6 +266,8 @@ class Storefront_to_listing():
                 pass
             description = re.sub(r"(Product Description.*; } )", "", description)
             description = re.sub(r"(From the manufacturer.*; } )", "", description)
+            description = description.replace("View larger ", "")
+            description = description.replace("Read more ", "")
             print("description:", description)
 
             salesrank = " "
@@ -326,6 +341,7 @@ class Storefront_to_listing():
                 "asin": self.asin,
                 "url": url,
                 "brand": brand,
+                "best_seller_badge": self.best_seller_badge,
                 "badge": badge,
                 "title": title,
                 "variation_name": variation_name,
