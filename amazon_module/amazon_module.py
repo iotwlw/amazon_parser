@@ -814,8 +814,15 @@ def keyword_to_long_tail_keyword_list(keyword):
     try:
         print("keyword:", keyword)
         print("-" * (len("keyword: ") + len(keyword)))
-        url_head = "https://completion.amazon.com/search/complete?method=completion&mkt=1&r=Y5KKREBZPVVDRZT19HX9&s=133-8959284-8300960&c=&p=Gateway&l=en_US&b2b=0&fresh=0&sv=desktop&client=amazon-search-ui&x=String&search-alias=aps&q="
-        url_tail = "&qs=&cf=1&fb=1&sc=1&"
+        if keyword[0] == "*":
+            # start with "*"
+            url_head = "https://completion.amazon.com/search/complete?method=completion&mkt=1&r=Y5KKREBZPVVDRZT19HX9&s=133-8959284-8300960&c=&p=Gateway&l=en_US&b2b=0&fresh=0&sv=desktop&client=amazon-search-ui&x=String&search-alias=aps&q=*&qs="
+            url_tail = "&cf=1&fb=1&sc=1&"
+        else:
+            # start without "*"
+            url_head = "https://completion.amazon.com/search/complete?method=completion&mkt=1&r=Y5KKREBZPVVDRZT19HX9&s=133-8959284-8300960&c=&p=Gateway&l=en_US&b2b=0&fresh=0&sv=desktop&client=amazon-search-ui&x=String&search-alias=aps&q="
+            url_tail = "&qs=&cf=1&fb=1&sc=1&"
+            
         try:
             keyword = keyword.replace(" ", "%20")
             keyword = keyword.replace("'", "%27")
