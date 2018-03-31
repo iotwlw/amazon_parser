@@ -4,6 +4,6 @@ amazon.com parser for keyword_rank, listing_info
 
 先阅读：python程序安装与使用方法V3.docx
 
-python3
+Python3
 
 有问题可联系：dg1245@qq.com
