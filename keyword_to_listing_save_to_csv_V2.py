@@ -11,10 +11,9 @@ class Keyword_to_listing():
     def __init__(self):
 
         self.keyword_list = [
-            "dog",
-            "cat",
+            "dog shock collar",
         ]
-        self.max_page = 2
+        self.max_page = 1
         self.csv_folder = ""
         self.csv_file_name = ""
         self.picture_folder = ""
@@ -216,13 +215,25 @@ class Keyword_to_listing():
             try:
                 if soup.find(id="productDescription"):
                     description = soup.find(id="productDescription").get_text()
-                if soup.find(id="aplus"):
-                    description = soup.find(id="aplus").get_text()
-                description = " ".join(description.split())
             except:
                 pass
             description = re.sub(r"(Product Description.*; } )", "", description)
+            description = description.replace("Read more", "")
+            description = " ".join(description.split())
             print("description:", description)
+
+            aplus = " "
+            try:
+                if soup.find(id="aplus"):
+                    aplus = soup.find(id="aplus").get_text()
+                aplus = " ".join(aplus.split())
+            except:
+                pass
+            aplus = re.sub(r"(From the manufacturer .aplus-v2 .*; } )", "", aplus)
+            aplus = re.sub(r"(Product Description .aplus-v2 .*; } )", "", aplus)
+            aplus = aplus.replace("Read more", "")
+            aplus = " ".join(aplus.split())
+            print("aplus:", aplus)
 
             salesrank = " "
             try:
@@ -310,6 +321,7 @@ class Keyword_to_listing():
                 "bullet_9": bullet_9,
                 "bullet_10": bullet_10,
                 "description": description,
+                "aplus": aplus,
                 "salesrank": salesrank,
                 "review_num": review_num,
                 "review_value": review_value,
