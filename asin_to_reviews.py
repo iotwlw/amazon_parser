@@ -1,3 +1,5 @@
+# coding=UTF-8
+# This Python file uses the following encoding: utf-8
 import requests
 from bs4 import BeautifulSoup
 import re
@@ -5,6 +7,9 @@ import random
 import os
 import csv
 import time
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
 from datetime import datetime
 
 class Asin_to_reviews():
@@ -12,15 +17,17 @@ class Asin_to_reviews():
     def __init__(self):
         # 这里填你要爬取得ASIN，注意英文引号，英文逗号，每行必须左对齐！
         self.asin_list = [
-            "B06XP6YVN4",
-            "B00196P2O8",
+            "B07B8L8J4Q",
+            # "B00196P2O8",
         ]
         # 这里填每个ASIN里review最大爬取页数
-        self.max_page = 20
+        self.max_page = 40
+        # avp_only_reviews表示爬取真实用户，all_reviews表示爬取所有
+        self.reviewer_type = "all_reviews"
         # recent表示爬取最近时间的review，top表示爬取默认排名高的review
         self.top_or_recent = "recent"
-        # all代表所有星级，positive代表好评，critical代表差评
-        self.all_or_positive_or_critical = "all"
+        # all代表所有星级，five_star 代表好评，critical代表差评
+        self.all_or_positive_or_critical = "five_star"
         # 防止爬取太频繁导致亚马逊买家页面不能访问，每爬取一个页面，休息的时间秒数
         self.sleep_time = 1
         # 下面的不用更改
@@ -103,7 +110,7 @@ class Asin_to_reviews():
         # soup = BeautifulSoup(r.read(), 'html.parser')
         # soup = BeautifulSoup(r.content.decode('utf-8'), 'html.parser')
         # soup = BeautifulSoup(r.content, 'html5lib')
-        time.sleep(self.sleep_time)
+        time.sleep(random.randint(5, 30))
         return soup
 
     def dict_list_to_csv_file(self):
@@ -123,20 +130,20 @@ class Asin_to_reviews():
             print("success to create reviews folder")
 
         try:
-            with open(csv_file_path, 'w', encoding='utf8', newline='') as f:
+            with open(csv_file_path, 'wb') as f:
                 f_csv = csv.DictWriter(f, headers)
                 f_csv.writeheader()
                 f_csv.writerows(self.reviews_dict_list)
                 print("success to write csv file...")
-        except:
-            print("fail to write csv!")
+        except Exception as e:
+            print("fail to write csv!: {}".format(e))
 
     def first_review_url_to_review_info(self, url, asin):
         location = re.search("ref=", url)
         span = location.span()[0]
         first_review_url_part1 = url[:span]
 
-        review_base_url = first_review_url_part1 + "ref=cm_cr_arp_d_viewopt_sr?ie=UTF8&filterByStar=" + self.all_or_positive_or_critical + "&reviewerType=avp_only_reviews&sortBy=" + self.top_or_recent + "&pageNumber="
+        review_base_url = first_review_url_part1 + "ref=cm_cr_arp_d_viewopt_sr?ie=UTF8&filterByStar=" + self.all_or_positive_or_critical + "&reviewerType="+self.reviewer_type+"&sortBy=" + self.top_or_recent + "&pageNumber="
         first_review_url = review_base_url + str(1)
         first_review_url_soup = self.download_soup_by_url(first_review_url)
 
