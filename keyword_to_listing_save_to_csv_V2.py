@@ -11,7 +11,7 @@ class Keyword_to_listing():
     def __init__(self):
 
         self.keyword_list = [
-            "dog shock collar",
+            "lightning to 3.5 mm",
         ]
         self.max_page = 1
         self.csv_folder = ""
@@ -38,7 +38,7 @@ class Keyword_to_listing():
 
         if not os.path.isfile(csv_file_path):
             try:
-                with open(csv_file_path, 'w', encoding='utf8', newline='') as f:
+                with open(csv_file_path, 'w') as f:
                     f_csv = csv.DictWriter(f, headers)
                     f_csv.writeheader()
                     print("success to write csv header!")
@@ -46,7 +46,7 @@ class Keyword_to_listing():
                 print("fail to write csv header!")
 
         try:
-            with open(csv_file_path, 'a+', encoding='utf8', newline='') as f:
+            with open(csv_file_path, 'a+') as f:
                 f_csv = csv.DictWriter(f, headers)
                 f_csv.writerow(self.listing_info_dict)
                 print("success to write csv content!")
