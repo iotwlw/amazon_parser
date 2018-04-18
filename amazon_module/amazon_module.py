@@ -771,7 +771,6 @@ def node_url_to_node_url_list(node_url):
 # csv_file_name = "shock collar 3" + ".csv"
 # dict_list_to_csv_file(dict_list, csv_file_name)
 
-#优化后的函数
 
 def keyword_to_merchantwords_search_rank(keyword):
     try:
