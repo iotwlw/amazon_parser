@@ -1,0 +1,17 @@
+# file
+*.pyc
+tags
+.DS_Store
+# dir
+__pycache__/
+.vscode/
+build/
+dist/
+*.egg-info/
+Google/
+*.idea/
+amazon_top_100/
+data/
+reviews/
+listing/
+store_salesrank_reviewstar/
