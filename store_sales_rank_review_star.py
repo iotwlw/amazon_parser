@@ -1,15 +1,16 @@
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
 import requests
 from bs4 import BeautifulSoup
 import re
 import random
+import time
 from datetime import datetime
 import csv
 import os
-# from amazon_module import amazon_module
+
 
 def download_soup_by_url(url):
-    # headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36'}
-    # headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:55.0) Gecko/20100101 Firefox/55.0'}
     headers_list = [
         {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36'},
         {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:55.0) Gecko/20100101 Firefox/55.0'},
@@ -34,54 +35,52 @@ def download_soup_by_url(url):
         {'User-Agent': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)'}
     ]
     headers = random.choice(headers_list)
-    # print("headers: ", headers)
     china_proxies_list = [
-                {'http:': 'http://123.56.169.22:3128'},
-                {'http:': 'http://121.196.226.246:84'},
-                {'http:': 'http://122.49.35.168:33128'},
-                {'http:': 'http://124.238.235.135:81'},
-                {'http:': 'http://121.40.199.105:80'},
-                {'http:': 'http://202.99.99.123:80'},
-                {'http:': 'http://61.153.67.110:9999'},
-                {'http:': 'http://121.40.213.161:80'},
-                {'http:': 'http://121.42.163.161:80'},
-                {'http:': 'http://111.13.7.42:81'},
-                {'http:': 'http://114.215.103.121:8081'},
-                {'http:': 'http://175.11.157.195:80'}
-                ]
+        {'http:': 'http://123.56.169.22:3128'},
+        {'http:': 'http://121.196.226.246:84'},
+        {'http:': 'http://122.49.35.168:33128'},
+        {'http:': 'http://124.238.235.135:81'},
+        {'http:': 'http://121.40.199.105:80'},
+        {'http:': 'http://202.99.99.123:80'},
+        {'http:': 'http://61.153.67.110:9999'},
+        {'http:': 'http://121.40.213.161:80'},
+        {'http:': 'http://121.42.163.161:80'},
+        {'http:': 'http://111.13.7.42:81'},
+        {'http:': 'http://114.215.103.121:8081'},
+        {'http:': 'http://175.11.157.195:80'}
+    ]
     usa_proxies_list = [
-                {'http:': 'http://40.140.245.109:8080'},
-                {'http:': 'http://50.116.12.78:8118'},
-                {'http:': 'http://69.85.70.37:53281'},
-                {'http:': 'http://35.195.160.37:1244'},
-                {'http:': 'http://104.131.122.164:8118'},
-                {'http:': 'http://32.115.161.78:53281'},
-                {'http:': 'http://165.227.7.51:80'},
-                {'http:': 'http://72.169.78.49:87'},
-                {'http:': 'http://52.24.67.217:80'},
-                {'http:': 'http://209.159.156.199:80'},
-                {'http:': 'http://198.35.55.147:443'},
-                {'http:': 'http://97.72.129.36:87'},
-                {'http:': 'http://152.160.35.171:80'},
-                {'http:': 'http://191.96.51.224:8080'},
-                {'http:': 'http://45.55.157.204:80'}
+        {'http:': 'http://40.140.245.109:8080'},
+        {'http:': 'http://50.116.12.78:8118'},
+        {'http:': 'http://69.85.70.37:53281'},
+        {'http:': 'http://35.195.160.37:1244'},
+        {'http:': 'http://104.131.122.164:8118'},
+        {'http:': 'http://32.115.161.78:53281'},
+        {'http:': 'http://165.227.7.51:80'},
+        {'http:': 'http://72.169.78.49:87'},
+        {'http:': 'http://52.24.67.217:80'},
+        {'http:': 'http://209.159.156.199:80'},
+        {'http:': 'http://198.35.55.147:443'},
+        {'http:': 'http://97.72.129.36:87'},
+        {'http:': 'http://152.160.35.171:80'},
+        {'http:': 'http://191.96.51.224:8080'},
+        {'http:': 'http://45.55.157.204:80'}
     ]
     proxies = random.choice(usa_proxies_list)
-    # proxies = random.choice(china_proxies_list)
-    # print("proxies: ", proxies)
-    # r = requests.get(url, headers=headers)
+    time.sleep(random.randint(5, 30))
     r = requests.get(url, headers=headers, proxies=proxies)
-    # print("Downloading: r.status_code=", r.status_code)
-    # print("url: ", url)
+    print("url: ", url)
+    print("Downloading: r.status_code=", r.status_code)
     if r.status_code != 200:
         headers = random.choice(headers_list)
         proxies = random.choice(china_proxies_list)
         r = requests.get(url, headers=headers, proxies=proxies)
-        # print("Downloading: r.status_code=", r.status_code)
+        print("Downloading: r.status_code=", r.status_code)
 
     soup = BeautifulSoup(r.content, 'html.parser')
     # soup = BeautifulSoup(r.content, 'html5lib')
     return soup
+
 
 def first_store_url_to_store_urls(store_frontpage_url, pages=1):
     pages_urls_list = []
@@ -99,10 +98,11 @@ def first_store_url_to_store_urls(store_frontpage_url, pages=1):
                 pages_urls_list.append(next_page_url)
         except:
             return pages_urls_list
-
         pages = pages - 1
 
+
     return pages_urls_list
+
 
 def store_url_to_asins(store_url):
     soup = download_soup_by_url(store_url)
@@ -115,7 +115,7 @@ def store_url_to_asins(store_url):
     lis = soup.find_all("li", class_="celwidget")
 
     # for index, li in enumerate(lis):
-        # print(index + 1, li['id'])
+    # print(index + 1, li['id'])
 
     asin_list = []
     for index, li in enumerate(lis):
@@ -124,6 +124,7 @@ def store_url_to_asins(store_url):
         # asin = amazon_module.url_to_asin(url)
         asin_list.append(asin)
     return asin_list
+
 
 def store_frontpage_url_to_asins(store_frontpage_url, pages=1):
     asins_list = []
@@ -142,6 +143,7 @@ def store_frontpage_url_to_asins(store_frontpage_url, pages=1):
             #     print("fail to download picture......")
 
     return asins_list
+
 
 def asin_to_simple_listing_info(asin):
     print("asin: ", asin)
@@ -180,7 +182,7 @@ def asin_to_simple_listing_info(asin):
     except:
         pass
 
-    #kitchen
+    # kitchen
     try:
         trs = soup.find(id="productDetails_detailBullets_sections1").find_all("tr")
         for tr in trs:
@@ -221,7 +223,6 @@ def asin_to_simple_listing_info(asin):
     print("salesrank_2: ", salesrank_2)
     print("salesrank_3: ", salesrank_3)
 
-
     review_num = "0"
     try:
         review_num = soup.find(id="acrCustomerReviewText").get_text().split()[0].strip()
@@ -243,13 +244,14 @@ def asin_to_simple_listing_info(asin):
     print(review_value_and_star)
 
     store_salesrank_and_review_star_dict = {
-                                            "asin" : asin,
-                                            "salesrank_1" : salesrank_1,
-                                            "salesrank_2" : salesrank_2,
-                                            "salesrank_3" : salesrank_3,
-                                            "review_value_and_star" : review_value_and_star,
-                                            }
+        "asin": asin,
+        "salesrank_1": salesrank_1,
+        "salesrank_2": salesrank_2,
+        "salesrank_3": salesrank_3,
+        "review_value_and_star": review_value_and_star,
+    }
     return store_salesrank_and_review_star_dict
+
 
 def dict_list_to_csv_file(csv_file_name, dict_list):
     print("***********************************")
@@ -268,13 +270,14 @@ def dict_list_to_csv_file(csv_file_name, dict_list):
         print("success to create picture folder")
 
     try:
-        with open(csv_file_path, 'w', encoding='utf8', newline='') as f:
+        with open(csv_file_path, 'w') as f:
             f_csv = csv.DictWriter(f, headers)
             f_csv.writeheader()
             f_csv.writerows(dict_list)
             print("success to write csv file...")
     except:
         print("fail to write csv!")
+
 
 csv_file_name = str(datetime.now()).replace(":", ";").strip().split(".")[0]
 start_time = datetime.now()
@@ -283,8 +286,7 @@ print("根据亚马逊店铺storefront的链接，获取该店铺产品的review
 print("")
 
 # store front url
-# 修改成你想要的店铺首页网址
-store_url = "https://www.amazon.com/s?marketplaceID=ATVPDKIKX0DER&me=A2FQ5GG01HBOZ1&merchant=A2FQ5GG01HBOZ1&redirect=true"
+store_url = "https://www.amazon.com/s?marketplaceID=ATVPDKIKX0DER&me=AOHK10F62B9A&merchant=AOHK10F62B9A&redirect=true"
 print("store_url:", store_url)
 
 pages = 1
@@ -321,5 +323,3 @@ how_many_seconds = end_time - start_time
 print(start_time)
 print(end_time)
 print(str(how_many_seconds.total_seconds()) + "seconds")
-
-
