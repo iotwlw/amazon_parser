@@ -4,13 +4,6 @@ import requests
 from bs4 import BeautifulSoup
 from amazon_module import amazon_module
 import re
-import random
-import time
-from datetime import datetime
-import csv
-import os
-
-import requests
 
 # proxy
 # SOCKS5 proxy for HTTP/HTTPS
@@ -104,7 +97,7 @@ try:
     review_value_and_star = review_num + "/" + review_value
     print(review_value_and_star)
 
-    # re.compile来匹配需要抓取的href地址
+    # follow_sell
     try:
         follow = soup.find_all(href=re.compile("/gp/offer-listing"))
         follow_sell = follow[0].get_text()
