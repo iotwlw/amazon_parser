@@ -1,5 +1,6 @@
 import datetime
 import pymysql
+import random
 
 from amazon_module import amazon_module
 import re
@@ -76,6 +77,7 @@ def asin_to_listing_info(asin):
     print("sold_by:", sold_by)
 
     ranking_list = []
+    offering_list = []
     spans_text = ""
     # Salesrank
     try:
@@ -102,7 +104,7 @@ def asin_to_listing_info(asin):
 
                             num = num + 1
                             rank_dict = {
-                                "rank_id": now,
+                                "detail_id": now,
                                 "rank_num": num,
                                 "rank_asin": asin,
                                 "rank_order": ranking,
@@ -170,9 +172,9 @@ def asin_to_listing_info(asin):
 
     try:
         if follow_type == "New" and follow_num > 1:
-            asin_to_offer_listing(asin, now)
+            offering_list = asin_to_offer_listing(asin, now)
         if follow_type == "Used & new" and follow_num > 2:
-            asin_to_offer_listing(asin, now)
+            offering_list = asin_to_offer_listing(asin, now)
 
     except Exception as e:
         print("Handling follow_sell errors !: {}".format(e))
@@ -197,7 +199,7 @@ def asin_to_listing_info(asin):
         "qa_num": qa_num,
     }
 
-    return listing_info_dict
+    return listing_info_dict, ranking_list, offering_list
 
 def insert_data_to_mysql(asin_dict, table_name, conn):
     print("insert_data_to_mysql")
@@ -323,7 +325,7 @@ def asin_to_offer_listing(asin,now):
                     store_price = span_price.get_text().strip().replace('$', '')
                 num = num + 1
                 offer_dict = {
-                    "offer_id": now,
+                    "detail_id": now,
                     "offer_num": num,
                     "offer_asin": asin,
                     "offer_name": store_name,
@@ -338,8 +340,9 @@ def asin_to_offer_listing(asin,now):
     except Exception as e:
         print("fail to asin_to_offer_listing: {}".format(e))
         pass
+    return offering_list
 
-def to_mysql():
+def product_detail_to_mysql():
     conn = pymysql.connect(db_config['host'], db_config['username'], db_config['password'],)
     cursor = conn.cursor()
 
@@ -354,26 +357,54 @@ def to_mysql():
     except:
         print("fail to use database:", db_name)
 
-    # # create table
-    # table_name = mysql_table
-    # print(table_name)
-    # try:
-    #     create_table_sql = "create table " + table_name + " (id int, asin char(10), insert_datetime char(30), url char(100), brand char(50), title varchar(500), variation_name varchar(250), price int, sold_by char(100), how_many_sellers char(100), review_num char(10), review_value char(10), qa_num char(10),follow_type char(10),follow_num int,buy_money int,spans_text  varchar(500))"
-    #     print(create_table_sql)
-    #     cursor.execute(create_table_sql)
-    #     print(cursor)
-    # except:
-    #     print("fail to create table:", table_name)
-
-    # keyword_to_asin_list
-
     table_name = 'product_detail'
-    try:
-        listing_info_dict = asin_to_listing_info('B01LXJFMGF')
-        insert_data_to_mysql(listing_info_dict, table_name, conn)
-    except:
-        print("fail")
+    asins = open('./ASIN', 'r')
+    for asin in asins:
+        try:
+            asin = asin.strip()
+            print ("{}:------------".format(datetime.datetime.now()) + asin + "----------------begin")
+            listing_info_dict, ranking_list, offering_list = asin_to_listing_info(asin)
+            insert_data_to_mysql(listing_info_dict, table_name, conn)
+            insert_mysql(ranking_list, "product_salesrank", conn)
+            insert_mysql(offering_list, "product_offer", conn)
+            sleep_time = random.randint(7, 600)
+            print ("{}:----------------Sleep:{}".format(datetime.datetime.now(), sleep_time) + "------end")
+            time.sleep(sleep_time)
+        except Exception as e:
+            print("Product_detail Error {}".format(e))
 
     conn.close()
 
-# to_mysql()
+def insert_mysql(offer_dict_list, table_name, conn):
+    insert_into_sql = "INSERT INTO " + table_name + "("
+    insert_into_sql_s = ""
+    datas = []
+    try:
+        if offer_dict_list[0]:
+            keys = offer_dict_list[0].keys()
+            for j in keys:
+                insert_into_sql = insert_into_sql + j+","
+                insert_into_sql_s = insert_into_sql_s + "%s,"
+            insert_into_sql = insert_into_sql.rstrip(",") + ") VALUES (" + insert_into_sql_s.rstrip(',') + ")"
+            print insert_into_sql
+
+    except Exception as e:
+        print("FAIL to insert_into_sql {}".format(e))
+
+    try:
+        for i in offer_dict_list:
+            data = tuple(i.values())
+            datas.append(data)
+            print datas
+    except Exception as e:
+        print("FAIL to insert_into_data {}".format(e))
+
+    try:
+        with conn.cursor() as cursor:
+            cursor.executemany(insert_into_sql, datas)
+            conn.commit()
+            print("success to insert asin_dict to mysql")
+    except Exception as e:
+        print("fail to insert asin_dict to mysql!{}".format(e))
+
+product_detail_to_mysql()
