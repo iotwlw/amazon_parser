@@ -19,8 +19,8 @@ max_page = 3
 db_config = {
     'host': 'localhost',
     'port': '3306',
-    'username': 'user',
-    'password': 'password',
+    'username': 'root',
+    'password': 'P@ssw0rd',
     'database': 'amazon_db',
     'charset': 'utf8'
 }
