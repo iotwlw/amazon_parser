@@ -153,7 +153,7 @@ def asin_to_listing_info(asin):
     # follow_sell
     how_many_sellers = ""
     follow_type = ""
-    follow_num = ""
+    follow_num = 0
     buy_money = ""
 
     try:
@@ -367,7 +367,7 @@ def product_detail_to_mysql():
             insert_data_to_mysql(listing_info_dict, table_name, conn)
             insert_mysql(ranking_list, "product_salesrank", conn)
             insert_mysql(offering_list, "product_offer", conn)
-            sleep_time = random.randint(7, 600)
+            sleep_time = random.randint(7, 100)
             print ("{}:----------------Sleep:{}".format(datetime.datetime.now(), sleep_time) + "------end")
             time.sleep(sleep_time)
         except Exception as e:
@@ -406,5 +406,3 @@ def insert_mysql(offer_dict_list, table_name, conn):
             print("success to insert asin_dict to mysql")
     except Exception as e:
         print("fail to insert asin_dict to mysql!{}".format(e))
-
-product_detail_to_mysql()
