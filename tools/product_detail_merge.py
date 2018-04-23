@@ -4,7 +4,6 @@
 import contextlib
 import datetime
 import pymysql
-import random
 
 from amazon_module import amazon_module
 import re
@@ -38,7 +37,6 @@ def asin_to_listing_info(asin):
             brand = soup.find(id="brand").get_text().strip()
     except:
         pass
-    print("brand:", brand)
 
     title = ""
     try:
@@ -46,21 +44,15 @@ def asin_to_listing_info(asin):
             title = soup.find(id="productTitle").get_text().strip()
     except:
         pass
-    print("title:", title)
 
     variation_name = " "
     try:
         if soup.find(id="variation_pattern_name"):
             variation_name = soup.find(id="variation_pattern_name").find("span").get_text().strip()
-            print("variation_pattern_name: ", variation_name)
         elif soup.find(id="variation_color_name"):
             variation_name = soup.find(id="variation_color_name").find("span").get_text().strip()
-            print("variation_color_name: ", variation_name)
         elif soup.find(id="variation_size_name"):
             variation_name = soup.find(id="variation_size_name").find("span").get_text().strip()
-            print("variation_size_name: ", variation_name)
-        else:
-            print("variation_name: ", variation_name)
     except:
         pass
 
@@ -72,7 +64,6 @@ def asin_to_listing_info(asin):
             price = soup.find(id="priceblock_ourprice").get_text().replace('$', '').strip()
     except:
         pass
-    print("price:", price)
 
     sold_by = " "
     try:
@@ -80,7 +71,6 @@ def asin_to_listing_info(asin):
             sold_by = " ".join(soup.find(id="merchant-info").get_text().strip().split())
     except:
         pass
-    print("sold_by:", sold_by)
 
     availability = ""
     try:
@@ -88,7 +78,6 @@ def asin_to_listing_info(asin):
             availability = soup.find(id="availability").find("span").get_text().strip()
     except:
         pass
-    print("availability:", availability)
 
     aplus = ""
     try:
@@ -96,7 +85,6 @@ def asin_to_listing_info(asin):
             aplus = soup.find(id="aplus").find("h2").get_text().strip()
     except:
         pass
-    print("availability:", aplus)
 
     ranking_list = []
     offering_list = []
@@ -136,17 +124,16 @@ def asin_to_listing_info(asin):
                                 "rank_order": ranking,
                                 "rank_text": rank_text,
                             }
-                            print rank_dict
                             ranking_list.append(rank_dict)
                         except Exception as e:
                             print("Handling Salesrank string errors !: {}".format(e))
                             pass
 
             except Exception as e:
-                print("Analyze Salesrank th Failed!: {}".format(e))
+                print("Analyze Salesrank th errors!: {}".format(e))
                 pass
     except Exception as e:
-        print("Analyze Salesrank Failed!: {}".format(e))
+        print("Analyze Salesrank errors!: {}".format(e))
         pass
 
     review_num = 0
@@ -155,7 +142,6 @@ def asin_to_listing_info(asin):
             review_num = soup.find(id="acrCustomerReviewText").get_text().split()[0].strip(",").strip().replace(',', '')
     except:
         pass
-    print("review_num:", review_num)
 
     review_value = 0.0
     try:
@@ -166,7 +152,6 @@ def asin_to_listing_info(asin):
             review_value = review_value.strip()
     except:
         pass
-    print("review_value:", review_value)
 
     qa_num = 0
     try:
@@ -174,8 +159,6 @@ def asin_to_listing_info(asin):
             qa_num = soup.find(id="askATFLink").get_text().split()[0].strip()
     except:
         pass
-    print("qa_num:", qa_num)
-
 
     try:
         review_list = soup.find(id="most-recent-reviews-content").find_all("div", {"data-hook": "recent-review"})
@@ -198,10 +181,9 @@ def asin_to_listing_info(asin):
                            "review_date": review_date,
                            "review_body": review_body,
                            }
-            print(review_dict)
             review_dict_list.append(review_dict)
     except Exception as e:
-        print "analyze review error:{}".format(e)
+        print "analyze review errors:{}".format(e)
         pass
 
     # follow_sell
@@ -232,6 +214,7 @@ def asin_to_listing_info(asin):
         "brand": brand,
         "title": title,
         "variation_name": variation_name,
+        "availability": availability,
         "price": price,
         "sold_by": sold_by,
         "how_many_sellers": how_many_sellers,
@@ -243,12 +226,12 @@ def asin_to_listing_info(asin):
         "review_last_time": review_last_time,
         "spans_text": spans_text,
         "qa_num": qa_num,
+        "aplus": aplus,
     }
 
     return listing_info_dict, ranking_list, offering_list, review_dict_list
 
 def insert_data_to_mysql(asin_dict, table_name):
-    print("insert_data_to_mysql")
     try:
         try:
             id = asin_dict["id"]
@@ -279,7 +262,12 @@ def insert_data_to_mysql(asin_dict, table_name):
             variation_name = asin_dict["variation_name"]
             variation_name = " ".join(variation_name.split())
             variation_name = pymysql.escape_string(variation_name)
-            print(variation_name)
+        except:
+            pass
+
+        try:
+            availability = asin_dict["availability"]
+            availability = pymysql.escape_string(availability)
         except:
             pass
         try:
@@ -337,21 +325,26 @@ def insert_data_to_mysql(asin_dict, table_name):
             review_last_time = pymysql.escape_string(review_last_time)
         except:
             pass
+        try:
+            aplus = asin_dict["aplus"]
+            aplus = pymysql.escape_string(aplus)
+        except:
+            pass
 
         try:
             insert_datetime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             insert_datetime = str(insert_datetime)
-            print("insert_datetime: ", insert_datetime)
 
             with mysql() as cursor:
-                insert_into_sql = "INSERT INTO " + table_name + " (id, asin, insert_datetime, url, brand, title, variation_name, price, sold_by, how_many_sellers, review_num, review_value, qa_num,follow_type,follow_num,buy_money,spans_text,review_last_time) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s') "
-                data = (id, asin, insert_datetime, url, brand, title, variation_name, price, sold_by, how_many_sellers, review_num, review_value, qa_num,follow_type,follow_num,buy_money,spans_text, review_last_time)
+                insert_into_sql = "INSERT INTO " + table_name + " (id, asin, insert_datetime, url, brand, title, variation_name, price, sold_by, how_many_sellers, review_num, review_value, qa_num,follow_type,follow_num,buy_money,spans_text,review_last_time,availability,aplus) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s') "
+                data = (id, asin, insert_datetime, url, brand, title, variation_name, price, sold_by, how_many_sellers, review_num, review_value, qa_num,follow_type,follow_num,buy_money,spans_text, review_last_time, availability, aplus)
+                print("[{}]".format(insert_datetime) + table_name+":", insert_into_sql)
                 cursor.execute(insert_into_sql % data)
                 print("success to insert "+table_name+" to mysql")
         except Exception as e:
-            print("fail to insert "+table_name+" to mysql!{}".format(e))
+            print("FAIL to insert "+table_name+" to mysql!{} errors".format(e))
     except Exception as e:
-        print("fail to insert "+table_name+" to mysql!!{}".format(e))
+        print("FAIL to insert "+table_name+" to mysql!!{} errors".format(e))
 
 
 def insert_mysql(offer_dict_list, table_name):
@@ -370,18 +363,18 @@ def insert_mysql(offer_dict_list, table_name):
             return
 
     except Exception as e:
-        print("FAIL to insert_"+table_name+"_sql {}".format(e))
+        print("FAIL to insert_"+table_name+"_sql {}  errors".format(e))
 
     try:
         for i in offer_dict_list:
             data = tuple(i.values())
             datas.append(data)
     except Exception as e:
-        print("FAIL to insert_"+table_name+"_data {}".format(e))
+        print("FAIL to insert_"+table_name+"_data {} errors".format(e))
 
     try:
         with mysql() as cursor:
             cursor.executemany(insert_into_sql, datas)
             print("success to insert "+table_name+" to mysql")
     except Exception as e:
-        print("fail to insert "+table_name+" to mysql!{}".format(e))
+        print("FAIL to insert "+table_name+" to mysql !{} errors".format(e))
