@@ -173,14 +173,14 @@ def asin_to_listing_info(asin):
                 review_last_time = review_date
             review_body = review.find("span", {"data-hook": "review-body-recent"}).get_text()
             review_dict = {
-                           "review_asin": asin,
-                           "review_title": review_title,
-                           "review_star": review_star_rating.rstrip(" out of 5 stars"),
-                           "review_author": review_author,
-                           "review_author_url": review_author_url,
-                           "review_date": review_date,
-                           "review_body": review_body,
-                           }
+                "review_asin": asin,
+                "review_title": review_title,
+                "review_star": review_star_rating.rstrip(" out of 5 stars"),
+                "review_author": review_author,
+                "review_author_url": review_author_url,
+                "review_date": review_date,
+                "review_body": review_body,
+            }
             review_dict_list.append(review_dict)
     except Exception as e:
         print "analyze review errors:{}".format(e)
@@ -206,7 +206,6 @@ def asin_to_listing_info(asin):
         print("Handling follow_sell errors !: {}".format(e))
         pass
 
-
     listing_info_dict = {
         "id": now,
         "asin": asin,
@@ -230,6 +229,7 @@ def asin_to_listing_info(asin):
     }
 
     return listing_info_dict, ranking_list, offering_list, review_dict_list
+
 
 def insert_data_to_mysql(asin_dict, table_name):
     try:
@@ -307,7 +307,7 @@ def insert_data_to_mysql(asin_dict, table_name):
         except:
             pass
         try:
-            review_value =asin_dict["review_value"]
+            review_value = asin_dict["review_value"]
             review_value = pymysql.escape_float(review_value)
         except:
             pass
@@ -331,20 +331,28 @@ def insert_data_to_mysql(asin_dict, table_name):
         except:
             pass
 
+        data = ()
         try:
             insert_datetime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             insert_datetime = str(insert_datetime)
 
             with mysql() as cursor:
-                insert_into_sql = "INSERT INTO " + table_name + " (id, asin, insert_datetime, url, brand, title, variation_name, price, sold_by, how_many_sellers, review_num, review_value, qa_num,follow_type,follow_num,buy_money,spans_text,review_last_time,availability,aplus) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s') "
-                data = (id, asin, insert_datetime, url, brand, title, variation_name, price, sold_by, how_many_sellers, review_num, review_value, qa_num,follow_type,follow_num,buy_money,spans_text, review_last_time, availability, aplus)
-                print("[{}]".format(insert_datetime) + table_name+":", insert_into_sql)
+                insert_into_sql = "INSERT INTO " + table_name + "(id, asin, insert_datetime, url, brand, title, " \
+                                                                "variation_name, price, sold_by, how_many_sellers, " \
+                                                                "review_num, review_value, qa_num,follow_type," \
+                                                                "follow_num,buy_money,spans_text,review_last_time," \
+                                                                "availability,aplus) VALUES ('%s', '%s', '%s', '%s', " \
+                                                                "'%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', " \
+                                                                "'%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s') "
+                data = (id, asin, insert_datetime, url, brand, title, variation_name, price, sold_by, how_many_sellers,
+                        review_num, review_value, qa_num, follow_type, follow_num, buy_money, spans_text,
+                        review_last_time, availability, aplus)
+                print("{}:".format(insert_datetime), insert_into_sql)
                 cursor.execute(insert_into_sql % data)
-                print("success to insert "+table_name+" to mysql")
         except Exception as e:
-            print("FAIL to insert "+table_name+" to mysql!{} errors".format(e))
+            print("INSERT " + table_name + " errors:{}".format(e),data)
     except Exception as e:
-        print("FAIL to insert "+table_name+" to mysql!!{} errors".format(e))
+        print("INSERT " + table_name + " errors!!{}".format(e))
 
 
 def insert_mysql(offer_dict_list, table_name):
@@ -355,26 +363,24 @@ def insert_mysql(offer_dict_list, table_name):
         if offer_dict_list and offer_dict_list[0]:
             keys = offer_dict_list[0].keys()
             for j in keys:
-                insert_into_sql = insert_into_sql + j+","
+                insert_into_sql = insert_into_sql + j + ","
                 insert_into_sql_s = insert_into_sql_s + "%s,"
             insert_into_sql = insert_into_sql.rstrip(",") + ") VALUES (" + insert_into_sql_s.rstrip(',') + ")"
             print insert_into_sql
         else:
             return
-
     except Exception as e:
-        print("FAIL to insert_"+table_name+"_sql {}  errors".format(e))
+        print("Splicing insert_into_" + table_name + "_sql errors:{}".format(e))
 
     try:
         for i in offer_dict_list:
             data = tuple(i.values())
             datas.append(data)
     except Exception as e:
-        print("FAIL to insert_"+table_name+"_data {} errors".format(e))
+        print("Splicing insert_into_" + table_name + "_data errors:{}".format(e))
 
     try:
         with mysql() as cursor:
             cursor.executemany(insert_into_sql, datas)
-            print("success to insert "+table_name+" to mysql")
     except Exception as e:
-        print("FAIL to insert "+table_name+" to mysql !{} errors".format(e))
+        print("INSERT " + table_name + "  !{} errors".format(e), datas)
