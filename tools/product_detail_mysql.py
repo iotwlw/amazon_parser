@@ -157,7 +157,7 @@ def asin_to_listing_info(asin):
     buy_money = ""
 
     try:
-        if soup.find(id="olp_feature_div"):
+        if soup.find(id="olp_feature_div").find("a"):
             how_many_sellers = soup.find(id="olp_feature_div").find("a").get_text().strip()
             follow_sell = how_many_sellers.split('(')
             follow_type = follow_sell[0].strip()
