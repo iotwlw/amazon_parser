@@ -225,9 +225,6 @@ def asin_to_listing_info(asin):
         print("Handling follow_sell errors !: {}".format(e))
         pass
 
-    except Exception as e:
-        print("Handling follow_sell errors !: {}".format(e))
-        pass
 
     listing_info_dict = {
         "id": now,
@@ -249,9 +246,9 @@ def asin_to_listing_info(asin):
         "qa_num": qa_num,
     }
 
-    return listing_info_dict, ranking_list, offering_list
+    return listing_info_dict, ranking_list, offering_list, review_dict_list
 
-def insert_data_to_mysql(asin_dict, table_name, conn):
+def insert_data_to_mysql(asin_dict, table_name):
     print("insert_data_to_mysql")
     try:
         try:
@@ -336,6 +333,11 @@ def insert_data_to_mysql(asin_dict, table_name, conn):
             qa_num = asin_dict["qa_num"]
         except:
             pass
+        try:
+            review_last_time = asin_dict["review_last_time"]
+            review_last_time = pymysql.escape_string(review_last_time)
+        except:
+            pass
 
         try:
             insert_datetime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -343,17 +345,17 @@ def insert_data_to_mysql(asin_dict, table_name, conn):
             print("insert_datetime: ", insert_datetime)
 
             with mysql() as cursor:
-                insert_into_sql = "INSERT INTO " + table_name + " (id, asin, insert_datetime, url, brand, title, variation_name, price, sold_by, how_many_sellers, review_num, review_value, qa_num,follow_type,follow_num,buy_money,spans_text) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s') "
-                data = (id, asin, insert_datetime, url, brand, title, variation_name, price, sold_by, how_many_sellers, review_num, review_value, qa_num,follow_type,follow_num,buy_money,spans_text)
-                cursor.execute(insert_into_sql % data )
-                print("success to insert asin_dict to mysql")
-        except:
-            print("fail to insert asin_dict to mysql!")
-    except:
-        print("fail to insert asin_dict to mysql!!")
+                insert_into_sql = "INSERT INTO " + table_name + " (id, asin, insert_datetime, url, brand, title, variation_name, price, sold_by, how_many_sellers, review_num, review_value, qa_num,follow_type,follow_num,buy_money,spans_text,review_last_time) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s') "
+                data = (id, asin, insert_datetime, url, brand, title, variation_name, price, sold_by, how_many_sellers, review_num, review_value, qa_num,follow_type,follow_num,buy_money,spans_text, review_last_time)
+                cursor.execute(insert_into_sql % data)
+                print("success to insert "+table_name+" to mysql")
+        except Exception as e:
+            print("fail to insert "+table_name+" to mysql!{}".format(e))
+    except Exception as e:
+        print("fail to insert "+table_name+" to mysql!!{}".format(e))
 
 
-def insert_mysql(offer_dict_list, table_name, conn):
+def insert_mysql(offer_dict_list, table_name):
     insert_into_sql = "INSERT INTO " + table_name + "("
     insert_into_sql_s = ""
     datas = []
@@ -367,7 +369,7 @@ def insert_mysql(offer_dict_list, table_name, conn):
             print insert_into_sql
 
     except Exception as e:
-        print("FAIL to insert_into_sql {}".format(e))
+        print("FAIL to insert_"+table_name+"_sql {}".format(e))
 
     try:
         for i in offer_dict_list:
@@ -375,11 +377,11 @@ def insert_mysql(offer_dict_list, table_name, conn):
             datas.append(data)
             print datas
     except Exception as e:
-        print("FAIL to insert_into_data {}".format(e))
+        print("FAIL to insert_"+table_name+"_data {}".format(e))
 
     try:
         with mysql() as cursor:
             cursor.executemany(insert_into_sql, datas)
-            print("success to insert asin_dict to mysql")
+            print("success to insert "+table_name+" to mysql")
     except Exception as e:
-        print("fail to insert asin_dict to mysql!{}".format(e))
+        print("fail to insert "+table_name+" to mysql!{}".format(e))
