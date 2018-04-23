@@ -29,7 +29,6 @@ def asin_to_listing_info(asin):
     print("asin: ", asin)
     url = "https://www.amazon.com/dp/" + asin
     soup = amazon_module.download_soup_by_url(url)
-    print(len(soup))
 
     brand = " "
     try:
@@ -65,7 +64,7 @@ def asin_to_listing_info(asin):
     except:
         pass
 
-    price = " "
+    price = 0.0
     try:
         if soup.find(id="price"):
             price = soup.find(id="price").find("span").get_text().replace('$', '').strip()
@@ -150,15 +149,15 @@ def asin_to_listing_info(asin):
         print("Analyze Salesrank Failed!: {}".format(e))
         pass
 
-    review_num = " "
+    review_num = 0
     try:
         if soup.find(id="acrCustomerReviewText"):
-            review_num = soup.find(id="acrCustomerReviewText").get_text().split()[0].strip()
+            review_num = soup.find(id="acrCustomerReviewText").get_text().split()[0].strip(",").strip().replace(',', '')
     except:
         pass
     print("review_num:", review_num)
 
-    review_value = " "
+    review_value = 0.0
     try:
         if soup.find(class_="arp-rating-out-of-text"):
             review_value = soup.find(class_="arp-rating-out-of-text").get_text().strip()
@@ -169,7 +168,7 @@ def asin_to_listing_info(asin):
         pass
     print("review_value:", review_value)
 
-    qa_num = " "
+    qa_num = 0
     try:
         if soup.find(id="askATFLink"):
             qa_num = soup.find(id="askATFLink").get_text().split()[0].strip()
@@ -209,10 +208,10 @@ def asin_to_listing_info(asin):
     how_many_sellers = ""
     follow_type = ""
     follow_num = 0
-    buy_money = ""
+    buy_money = 0.0
 
     try:
-        if soup.find(id="olp_feature_div"):
+        if soup.find(id="olp_feature_div").find("a"):
             how_many_sellers = soup.find(id="olp_feature_div").find("a").get_text().strip()
             follow_sell = how_many_sellers.split('(')
             follow_type = follow_sell[0].strip()
@@ -316,7 +315,7 @@ def insert_data_to_mysql(asin_dict, table_name):
 
         try:
             review_num = asin_dict["review_num"]
-            review_num = pymysql.escape_string(review_num)
+            review_num = pymysql.escape_int(review_num)
         except:
             pass
         try:
@@ -360,13 +359,15 @@ def insert_mysql(offer_dict_list, table_name):
     insert_into_sql_s = ""
     datas = []
     try:
-        if offer_dict_list[0]:
+        if offer_dict_list and offer_dict_list[0]:
             keys = offer_dict_list[0].keys()
             for j in keys:
                 insert_into_sql = insert_into_sql + j+","
                 insert_into_sql_s = insert_into_sql_s + "%s,"
             insert_into_sql = insert_into_sql.rstrip(",") + ") VALUES (" + insert_into_sql_s.rstrip(',') + ")"
             print insert_into_sql
+        else:
+            return
 
     except Exception as e:
         print("FAIL to insert_"+table_name+"_sql {}".format(e))
@@ -375,7 +376,6 @@ def insert_mysql(offer_dict_list, table_name):
         for i in offer_dict_list:
             data = tuple(i.values())
             datas.append(data)
-            print datas
     except Exception as e:
         print("FAIL to insert_"+table_name+"_data {}".format(e))
 
