@@ -91,7 +91,9 @@ def asin_to_listing_info(asin):
     spans_text = ""
 
     review_dict_list = []
-    review_last_time = ""
+    review_last_desc = ""
+    review_last_time = 0
+    review_last_unit = ""
 
     # Salesrank
     try:
@@ -168,10 +170,16 @@ def asin_to_listing_info(asin):
             review_star_rating = review.find("i", {"data-hook": "review-star-rating-recent"}).get_text()
             review_author_url = review.find("a", {"class": "a-profile"})["href"]
             review_author = review.find("span", {"class": "a-profile-name"}).get_text()
-            review_date = review.find("span", {"data-hook": "review-author-timestamp"}).get_text()
-            if review_index == 0:
-                review_last_time = review_date
+            review_date_desc = review.find("span", {"data-hook": "review-author-timestamp"}).get_text()
             review_body = review.find("span", {"data-hook": "review-body-recent"}).get_text()
+            review_date_desc_temp = review_date_desc.lstrip('Published ').rstrip(' ago')
+            review_date_desc_arr = review_date_desc_temp.split(' ')
+            review_date = review_date_desc_arr[0]
+            review_date_unit = review_date_desc_arr[1].rstrip('s')
+            if review_index == 0:
+                review_last_desc = review_date_desc
+                review_last_time = review_date
+                review_last_unit = review_date_unit
             review_dict = {
                 "review_asin": asin,
                 "review_title": review_title,
@@ -179,6 +187,8 @@ def asin_to_listing_info(asin):
                 "review_author": review_author,
                 "review_author_url": review_author_url,
                 "review_date": review_date,
+                "review_date_unit": review_date_unit,
+                "review_date_desc": review_date_desc,
                 "review_body": review_body,
             }
             review_dict_list.append(review_dict)
@@ -223,6 +233,8 @@ def asin_to_listing_info(asin):
         "review_num": review_num,
         "review_value": review_value,
         "review_last_time": review_last_time,
+        "review_last_unit": review_last_unit,
+        "review_last_desc": review_last_desc,
         "spans_text": spans_text,
         "qa_num": qa_num,
         "aplus": aplus,
@@ -322,7 +334,17 @@ def insert_data_to_mysql(asin_dict, table_name):
             pass
         try:
             review_last_time = asin_dict["review_last_time"]
-            review_last_time = pymysql.escape_string(review_last_time)
+            review_last_time = pymysql.escape_int(review_last_time)
+        except:
+            pass
+        try:
+            review_last_unit = asin_dict["review_last_unit"]
+            review_last_unit = pymysql.escape_string(review_last_unit)
+        except:
+            pass
+        try:
+            review_last_desc = asin_dict["review_last_desc"]
+            review_last_desc = pymysql.escape_string(review_last_desc)
         except:
             pass
         try:
@@ -341,16 +363,18 @@ def insert_data_to_mysql(asin_dict, table_name):
                                                                 "variation_name, price, sold_by, how_many_sellers, " \
                                                                 "review_num, review_value, qa_num,follow_type," \
                                                                 "follow_num,buy_money,spans_text,review_last_time," \
-                                                                "availability,aplus) VALUES ('%s', '%s', '%s', '%s', " \
+                                                                "availability,aplus,review_last_unit," \
+                                                                "review_last_desc) VALUES ('%s', '%s', '%s', '%s', " \
                                                                 "'%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', " \
-                                                                "'%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s') "
+                                                                "'%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', " \
+                                                                "'%s', '%s') "
                 data = (id, asin, insert_datetime, url, brand, title, variation_name, price, sold_by, how_many_sellers,
                         review_num, review_value, qa_num, follow_type, follow_num, buy_money, spans_text,
-                        review_last_time, availability, aplus)
+                        review_last_time, availability, aplus, review_last_unit, review_last_desc)
                 print("{}:".format(insert_datetime), insert_into_sql)
                 cursor.execute(insert_into_sql % data)
         except Exception as e:
-            print("INSERT " + table_name + " errors:{}".format(e),data)
+            print("INSERT " + table_name + " errors:{}".format(e), data)
     except Exception as e:
         print("INSERT " + table_name + " errors!!{}".format(e))
 
