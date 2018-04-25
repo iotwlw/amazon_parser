@@ -30,9 +30,11 @@ def asin_to_listing_info(asin):
     soup = amazon_module.download_soup_by_url(url)
 
     brand = " "
+    brand_url = ""
     try:
         if soup.find(id="bylineInfo"):
             brand = soup.find(id="bylineInfo").get_text().strip()
+            brand_url = soup.find(id="bylineInfo")["href"]
         if soup.find(id="brand"):
             brand = soup.find(id="brand").get_text().strip()
     except:
@@ -176,6 +178,7 @@ def asin_to_listing_info(asin):
             review_date_desc_arr = review_date_desc_temp.split(' ')
             review_date = review_date_desc_arr[0]
             review_date_unit = review_date_desc_arr[1].rstrip('s')
+            #TODO:
             if review_index == 0:
                 review_last_desc = review_date_desc
                 review_last_time = review_date
@@ -221,6 +224,7 @@ def asin_to_listing_info(asin):
         "asin": asin,
         "url": url,
         "brand": brand,
+        "brand_url": brand_url,
         "title": title,
         "variation_name": variation_name,
         "availability": availability,
@@ -352,6 +356,11 @@ def insert_data_to_mysql(asin_dict, table_name):
             aplus = pymysql.escape_string(aplus)
         except:
             pass
+        try:
+            brand_url = asin_dict["brand_url"]
+            brand_url = pymysql.escape_string(brand_url)
+        except:
+            pass
 
         data = ()
         try:
@@ -364,13 +373,13 @@ def insert_data_to_mysql(asin_dict, table_name):
                                                                 "review_num, review_value, qa_num,follow_type," \
                                                                 "follow_num,buy_money,spans_text,review_last_time," \
                                                                 "availability,aplus,review_last_unit," \
-                                                                "review_last_desc) VALUES ('%s', '%s', '%s', '%s', " \
+                                                                "review_last_desc,brand_url) VALUES ('%s', '%s', '%s', '%s', " \
                                                                 "'%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', " \
                                                                 "'%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', " \
-                                                                "'%s', '%s') "
+                                                                "'%s', '%s', '%s') "
                 data = (id, asin, insert_datetime, url, brand, title, variation_name, price, sold_by, how_many_sellers,
                         review_num, review_value, qa_num, follow_type, follow_num, buy_money, spans_text,
-                        review_last_time, availability, aplus, review_last_unit, review_last_desc)
+                        review_last_time, availability, aplus, review_last_unit, review_last_desc, brand_url)
                 print("{}:".format(insert_datetime), insert_into_sql)
                 cursor.execute(insert_into_sql % data)
         except Exception as e:
@@ -407,4 +416,19 @@ def insert_mysql(offer_dict_list, table_name):
         with mysql() as cursor:
             cursor.executemany(insert_into_sql, datas)
     except Exception as e:
-        print("INSERT " + table_name + "  !{} errors".format(e), datas)
+        print("INSERT " + table_name + " errors:{}".format(e), datas)
+
+
+def update_listing_google(data_asins):
+    # state: 0  insert data
+    #        -1 error data
+    #        2  handled by Amazon program
+    #        11 first filter by under 30 review_num and under 4.0 review_value
+    update_sql = "UPDATE listing_google set state = 2 where asin = %s"
+
+    try:
+        with mysql() as cursor:
+            row_count = cursor.executemany(update_sql, data_asins)
+            print("UPDATE listing_google {}/{} success:", row_count, len(data_asins))
+    except Exception as e:
+        print("UPDATE listing_google errors:{}".format(e), data_asins)
