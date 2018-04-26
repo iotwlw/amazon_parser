@@ -34,83 +34,55 @@ def download_soup_by_url(url):
         ]
     headers = random.choice(headers_list)
     china_proxies_list = [
-                {'http:': 'http://121.196.226.246:84'},
-                {'http:': 'http://121.40.199.105:80'},
-                {'http:': 'http://202.99.99.123:80'},
-                {'http:': 'http://121.42.163.161:80'},
-                {'http:': 'http://116.199.2.196:80'},
-                {'http:': 'http://116.199.115.78:80'},
-                {'http:': 'http://116.199.2.196:82'},
-                {'http:': 'http://116.199.115.78:82'},
-                {'http:': 'http://116.199.2.210:80'},
-                {'http:': 'http://116.199.2.209:82'},
-                {'http:': 'http://116.199.115.79:80'},
-                {'http:': 'http://116.199.2.210:82'},
-                {'http:': 'http://123.57.76.102:80'},
-                {'http:': 'http://116.199.2.209:80'},
-                {'http:': 'http://116.199.115.78:81'},
-                {'http:': 'http://114.215.102.168:8081'},
-                {'http:': 'http://117.34.72.251:8082'},
-                {'http:': 'http://116.199.2.208:82'},
-                {'http:': 'http://118.193.107.125:80'},
-                {'http:': 'http://118.193.107.54:80'},
-                {'http:': 'http://116.199.2.208:80'},
-                {'http:': 'http://116.199.2.209:82'},
-                {'http:': 'http://118.89.103.211:8080'},
-                {'http:': 'http://112.114.93.16:8118'},
-                {'http:': 'http://222.76.187.43:8118'},
-                {'http:': 'http://111.20.46.118:80'},
-                {'http:': 'http://112.114.92.171:8118'},
-                {'http:': 'http://61.187.251.235:80'},
-                {'http:': 'http://211.138.60.25:80'},
-                {'http:': 'http://58.240.53.196:8080'},
-                {'http:': 'http://58.56.128.84:9001'},
-                {'http:': 'http://121.43.178.58:3128'},
-                {'http:': 'http://118.193.107.97:80'},
-                {'http:': 'http://183.136.218.253:80'},
-                {'http:': 'http://111.20.46.86:80'},
-                {'http:': 'http://111.20.46.122:80'},
-                {'http:': 'http://166.111.131.52:3128'},
-                {'http:': 'http://202.85.213.219:3128'},
-                {'http:': 'http://111.20.46.87:80'},
-                {'http:': 'http://111.20.46.126:80'},
+            {'https': 'https://120.92.119.120:10010', },
+            {'https': 'https://39.134.108.91:80', },
+            {'https': 'https://120.92.88.202:10000', },
+            {'https': 'https://39.134.108.89:80', },
+            {'https': 'https://221.122.91.66:80', },
+            {'https': 'https://221.122.91.34:80', },
+            {'https': 'https://221.122.91.60:80', },
+            {'https': 'https://221.122.91.59:80', },
+            {'https': 'https://39.134.61.74:80', },
+            {'https': 'https://218.60.8.98:3129', },
+            {'https': 'https://180.168.184.179:53128', },
+            {'https': 'https://59.67.152.230:3128', },
+            {'https': 'https://123.56.75.209:3128', },
+            {'https': 'https://182.202.220.11:61234', },
+            {'https': 'https://218.60.8.99:3129', },
+            {'https': 'https://121.234.244.234:61234', },
+            {'https': 'https://223.93.139.174:1080', },
+            {'https': 'https://218.72.110.132:18118', },
+            {'https': 'https://223.241.118.196:18118', },
+            {'https': 'https://223.241.116.65:18118', },
+            {'https': 'https://60.166.194.55:61234', },
+            {'https': 'https://183.250.255.86:63000', },
+            {'https': 'https://119.27.177.169:80', },
+            {'https': 'https://118.212.137.133:31288', },
+            {'https': 'https://113.121.43.246:61234', },
+            {'https': 'https://114.215.95.188:3128', },
+            {'https': 'https://112.248.22.140:61234', },
+            {'https': 'https://1.196.161.172:9999', },
+            {'https': 'https://175.6.2.174:8088', },
+            {'https': 'https://223.145.230.60:6666', },
+            {'https': 'https://101.37.14.172:3128', },
+            {'https': 'https://219.135.164.245:3128', },
 
-                ]
-    usa_proxies_list = [
-                {'http:': 'http://40.140.245.109:8080'},
-                {'http:': 'http://50.116.12.78:8118'},
-                {'http:': 'http://69.85.70.37:53281'},
-                {'http:': 'http://35.195.160.37:1244'},
-                {'http:': 'http://104.131.122.164:8118'},
-                {'http:': 'http://32.115.161.78:53281'},
-                {'http:': 'http://165.227.7.51:80'},
-                {'http:': 'http://72.169.78.49:87'},
-                {'http:': 'http://52.24.67.217:80'},
-                {'http:': 'http://209.159.156.199:80'},
-                {'http:': 'http://198.35.55.147:443'},
-                {'http:': 'http://97.72.129.36:87'},
-                {'http:': 'http://152.160.35.171:80'},
-                {'http:': 'http://191.96.51.224:8080'},
-                {'http:': 'http://45.55.157.204:80'}
     ]
-    # proxies = random.choice(usa_proxies_list)
-    # proxies = random.choice(china_proxies_list)
-    r = requests.get(url, headers=headers)
-    # r = requests.get(url, headers=headers, proxies=proxies)
+    proxies = {'https': 'https://218.60.8.98:3129', }
+    r = requests.get(url, headers=headers, proxies=proxies)
     # print("Downloading: r.status_code=", r.status_code)
-    # print("url: ", url)
-
-    # soup = BeautifulSoup(r.content, 'html.parser')
     # soup = BeautifulSoup(r.content, 'html5lib')
     soup = BeautifulSoup(r.content, 'html.parser')
 
     count = 9
     while count > 0 and ("Robot Check" in soup.get_text()):
         print("Robot Check")
-        slee_time = time.sleep(random.choice([0.5, 1, 2, 3, 4]))
+        sleep_time = time.sleep(random.choice([0.5, 1, 2, 3, 4]))
+        print "try again sleep time :" + sleep_time
         headers = random.choice(headers_list)
         proxies = random.choice(china_proxies_list)
         r = requests.get(url, headers=headers, proxies=proxies)
+
         count -= 1
         soup = BeautifulSoup(r.content, 'html.parser')
 
