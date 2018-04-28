@@ -23,10 +23,12 @@ def mysql(host='127.0.0.1', port=3306, user='root', passwd='P@ssw0rd', db='amazo
         conn.close()
 
 
-def asin_to_listing_info(asin):
+def asin_to_listing_info(asin, country=None):
     now = int(time.time())
     print("asin: ", asin)
     url = "https://www.amazon.com/dp/" + asin
+    if country:
+        url = "https://www.amazon.co.uk/dp/" + asin
     soup = amazon_module.download_soup_by_url(url)
 
     brand = " "
@@ -61,9 +63,13 @@ def asin_to_listing_info(asin):
     price = 0.0
     try:
         if soup.find(id="price"):
-            price = soup.find(id="price").find("span").get_text().replace('$', '').strip()
+            price = soup.find(id="price").find("span").get_text()
+            price = re.search('(\d\.\d*)', price)
+            price = price.group()
         if soup.find(id="priceblock_ourprice"):
-            price = soup.find(id="priceblock_ourprice").get_text().replace('$', '').strip()
+            price = soup.find(id="priceblock_ourprice").get_text()
+            price = re.search('(\d\.\d*)', price)
+            price = price.group()
     except:
         pass
 
@@ -208,12 +214,17 @@ def asin_to_listing_info(asin):
     try:
         if soup.find(id="olp_feature_div").find("a"):
             how_many_sellers = soup.find(id="olp_feature_div").find("a").get_text().strip()
-            follow_sell = how_many_sellers.split('(')
-            follow_type = follow_sell[0].strip()
-            follow_num = follow_sell[1].split(')')
-            buy_money = follow_num[1].split('$')
-            buy_money = buy_money[1].strip()
-            follow_num = follow_num[0].strip()
+            if country:
+                follow_sell = how_many_sellers.split()
+                follow_num = follow_sell[0].strip()
+                follow_type = follow_sell[1].strip()
+            else:
+                follow_sell = how_many_sellers.split('(')
+                follow_type = follow_sell[0].strip()
+                follow_num = follow_sell[1].split(')')
+                buy_money = follow_num[1].split('$')
+                buy_money = buy_money[1].strip()
+                follow_num = follow_num[0].strip()
 
     except Exception as e:
         print("Handling follow_sell errors !: {}".format(e))
@@ -432,3 +443,6 @@ def update_listing_google(data_asins):
             print("UPDATE listing_google {}/{} success:", row_count, len(data_asins))
     except Exception as e:
         print("UPDATE listing_google errors:{}".format(e), data_asins)
+
+
+

@@ -17,22 +17,24 @@ db_config = {
 }
 
 
-def asin_to_listing_info(asin):
+def asin_to_listing_info(asin, country=None):
     now = int(time.time())
     print("asin: ", asin)
     url = "https://www.amazon.com/dp/" + asin
+    if country:
+        url = "https://www.amazon.co.uk/dp/" + asin
     soup = amazon_module.download_soup_by_url(url)
-    print(len(soup))
 
     brand = " "
+    brand_url = ""
     try:
         if soup.find(id="bylineInfo"):
             brand = soup.find(id="bylineInfo").get_text().strip()
+            brand_url = soup.find(id="bylineInfo")["href"]
         if soup.find(id="brand"):
             brand = soup.find(id="brand").get_text().strip()
     except:
         pass
-    print("brand:", brand)
 
     title = ""
     try:
@@ -40,33 +42,30 @@ def asin_to_listing_info(asin):
             title = soup.find(id="productTitle").get_text().strip()
     except:
         pass
-    print("title:", title)
 
     variation_name = " "
     try:
         if soup.find(id="variation_pattern_name"):
             variation_name = soup.find(id="variation_pattern_name").find("span").get_text().strip()
-            print("variation_pattern_name: ", variation_name)
         elif soup.find(id="variation_color_name"):
             variation_name = soup.find(id="variation_color_name").find("span").get_text().strip()
-            print("variation_color_name: ", variation_name)
         elif soup.find(id="variation_size_name"):
             variation_name = soup.find(id="variation_size_name").find("span").get_text().strip()
-            print("variation_size_name: ", variation_name)
-        else:
-            print("variation_name: ", variation_name)
     except:
         pass
 
-    price = " "
+    price = 0.0
     try:
         if soup.find(id="price"):
-            price = soup.find(id="price").find("span").get_text().replace('$', '').strip()
+            price = soup.find(id="price").find("span").get_text()
+            price = re.search('(\d\.\d*)', price)
+            price = price.group()
         if soup.find(id="priceblock_ourprice"):
-            price = soup.find(id="priceblock_ourprice").get_text().replace('$', '').strip()
+            price = soup.find(id="priceblock_ourprice").get_text()
+            price = re.search('(\d\.\d*)', price)
+            price = price.group()
     except:
         pass
-    print("price:", price)
 
     sold_by = " "
     try:
@@ -74,11 +73,30 @@ def asin_to_listing_info(asin):
             sold_by = " ".join(soup.find(id="merchant-info").get_text().strip().split())
     except:
         pass
-    print("sold_by:", sold_by)
+
+    availability = ""
+    try:
+        if soup.find(id="availability"):
+            availability = soup.find(id="availability").find("span").get_text().strip()
+    except:
+        pass
+
+    aplus = ""
+    try:
+        if soup.find(id="aplus"):
+            aplus = soup.find(id="aplus").find("h2").get_text().strip()
+    except:
+        pass
 
     ranking_list = []
     offering_list = []
     spans_text = ""
+
+    review_dict_list = []
+    review_last_desc = ""
+    review_last_time = 0
+    review_last_unit = ""
+
     # Salesrank
     try:
         trs = soup.find(id="productDetails_detailBullets_sections1").find_all("tr")
@@ -110,28 +128,26 @@ def asin_to_listing_info(asin):
                                 "rank_order": ranking,
                                 "rank_text": rank_text,
                             }
-                            print rank_dict
                             ranking_list.append(rank_dict)
                         except Exception as e:
                             print("Handling Salesrank string errors !: {}".format(e))
                             pass
 
             except Exception as e:
-                print("Analyze Salesrank th Failed!: {}".format(e))
+                print("Analyze Salesrank th errors!: {}".format(e))
                 pass
     except Exception as e:
-        print("Analyze Salesrank Failed!: {}".format(e))
+        print("Analyze Salesrank errors!: {}".format(e))
         pass
 
-    review_num = " "
+    review_num = 0
     try:
         if soup.find(id="acrCustomerReviewText"):
-            review_num = soup.find(id="acrCustomerReviewText").get_text().split()[0].strip()
+            review_num = soup.find(id="acrCustomerReviewText").get_text().split()[0].strip(",").strip().replace(',', '')
     except:
         pass
-    print("review_num:", review_num)
 
-    review_value = " "
+    review_value = 0.0
     try:
         if soup.find(class_="arp-rating-out-of-text"):
             review_value = soup.find(class_="arp-rating-out-of-text").get_text().strip()
@@ -140,41 +156,79 @@ def asin_to_listing_info(asin):
             review_value = review_value.strip()
     except:
         pass
-    print("review_value:", review_value)
 
-    qa_num = " "
+    qa_num = 0
     try:
         if soup.find(id="askATFLink"):
             qa_num = soup.find(id="askATFLink").get_text().split()[0].strip()
     except:
         pass
-    print("qa_num:", qa_num)
+
+    try:
+        review_list = soup.find(id="most-recent-reviews-content").find_all("div", {"data-hook": "recent-review"})
+
+        for review_index, review in enumerate(review_list):
+            review_title = review.find("span", {"data-hook": "review-title-recent"}).get_text()
+            review_star_rating = review.find("i", {"data-hook": "review-star-rating-recent"}).get_text()
+            review_author_url = review.find("a", {"class": "a-profile"})["href"]
+            review_author = review.find("span", {"class": "a-profile-name"}).get_text()
+            review_date_desc = review.find("span", {"data-hook": "review-author-timestamp"}).get_text()
+            review_body = review.find("span", {"data-hook": "review-body-recent"}).get_text()
+            review_date_desc_temp = review_date_desc.lstrip('Published ').rstrip(' ago')
+            review_date_desc_arr = review_date_desc_temp.split(' ')
+            review_date = review_date_desc_arr[0]
+            review_date_unit = review_date_desc_arr[1].rstrip('s')
+            #TODO:
+            if review_index == 0:
+                review_last_desc = review_date_desc
+                review_last_time = review_date
+                review_last_unit = review_date_unit
+            review_dict = {
+                "review_asin": asin,
+                "review_title": review_title,
+                "review_star": review_star_rating.rstrip(" out of 5 stars"),
+                "review_author": review_author,
+                "review_author_url": review_author_url,
+                "review_date": review_date,
+                "review_date_unit": review_date_unit,
+                "review_date_desc": review_date_desc,
+                "review_body": review_body,
+            }
+            review_dict_list.append(review_dict)
+    except Exception as e:
+        print "analyze review errors:{}".format(e)
+        pass
 
     # follow_sell
     how_many_sellers = ""
     follow_type = ""
     follow_num = 0
-    buy_money = ""
+    buy_money = 0.0
 
     try:
         if soup.find(id="olp_feature_div").find("a"):
             how_many_sellers = soup.find(id="olp_feature_div").find("a").get_text().strip()
-            follow_sell = how_many_sellers.split('(')
-            follow_type = follow_sell[0].strip()
-            follow_num = follow_sell[1].split(')')
-            buy_money = follow_num[1].split('$')
-            buy_money = buy_money[1].strip()
-            follow_num = follow_num[0].strip()
+            if country:
+                follow_sell = how_many_sellers.split()
+                follow_num = follow_sell[0].strip()
+                follow_type = follow_sell[1].strip()
+            else:
+                follow_sell = how_many_sellers.split('(')
+                follow_type = follow_sell[0].strip()
+                follow_num = follow_sell[1].split(')')
+                buy_money = follow_num[1].split('$')
+                buy_money = buy_money[1].strip()
+                follow_num = follow_num[0].strip()
 
     except Exception as e:
         print("Handling follow_sell errors !: {}".format(e))
         pass
 
     try:
-        if follow_type == "New" and follow_num > 1:
-            offering_list = asin_to_offer_listing(asin, now)
+        if (follow_type == "New" or follow_type == "new")and follow_num > 1:
+            offering_list = asin_to_offer_listing(asin, now, country)
         if follow_type == "Used & new" and follow_num > 2:
-            offering_list = asin_to_offer_listing(asin, now)
+            offering_list = asin_to_offer_listing(asin, now, country)
 
     except Exception as e:
         print("Handling follow_sell errors !: {}".format(e))
@@ -298,14 +352,17 @@ def insert_data_to_mysql(asin_dict, table_name, conn):
                 cursor.execute(insert_into_sql % data )
                 conn.commit()
                 print("success to insert asin_dict to mysql")
-        except:
-            print("fail to insert asin_dict to mysql!")
-    except:
-        print("fail to insert asin_dict to mysql!!")
+        except Exception as e:
+            print("INSERT " + table_name + " errors:{}".format(e), data)
+    except Exception as e:
+        print("INSERT " + table_name + " errors!!{}".format(e))
 
-def asin_to_offer_listing(asin,now):
+
+def asin_to_offer_listing(asin, now, country=None):
     print("asin: ", asin)
     url = "https://www.amazon.com/gp/offer-listing/" + asin + "/dp_olp_new_mbc?ie=UTF8&condition=new"
+    if country:
+        url = "https://www.amazon.co.uk/gp/offer-listing/" + asin + "/dp_olp_new_mbc?ie=UTF8&condition=new"
     soup = amazon_module.download_soup_by_url(url)
     offering_list = []
     try:
@@ -322,7 +379,9 @@ def asin_to_offer_listing(asin,now):
                     store_url = store_url + span_name.find("a")['href']
                 span_price = div.find("span", class_="a-size-large a-color-price olpOfferPrice a-text-bold")
                 if span_price:
-                    store_price = span_price.get_text().strip().replace('$', '')
+                    store_price = span_price.get_text().strip()
+                    store_price = re.search('(\d\.\d*)', store_price)
+                    store_price = store_price.group()
                 num = num + 1
                 offer_dict = {
                     "detail_id": now,
@@ -342,7 +401,8 @@ def asin_to_offer_listing(asin,now):
         pass
     return offering_list
 
-def product_detail_to_mysql():
+
+def product_detail_to_mysql(country=None):
     conn = pymysql.connect(db_config['host'], db_config['username'], db_config['password'],)
     cursor = conn.cursor()
 
@@ -358,16 +418,19 @@ def product_detail_to_mysql():
         print("fail to use database:", db_name)
 
     table_name = 'product_detail'
+
     asins = open('./ASIN', 'r')
+    if country:
+        asins = open('./ASIN'+country, 'r')
     for asin in asins:
         try:
             asin = asin.strip()
             print ("{}:------------".format(datetime.datetime.now()) + asin + "----------------begin")
-            listing_info_dict, ranking_list, offering_list = asin_to_listing_info(asin)
+            listing_info_dict, ranking_list, offering_list = asin_to_listing_info(asin,country)
             insert_data_to_mysql(listing_info_dict, table_name, conn)
             insert_mysql(ranking_list, "product_salesrank", conn)
             insert_mysql(offering_list, "product_offer", conn)
-            sleep_time = random.randint(7, 100)
+            sleep_time = random.randint(2, 20)
             print ("{}:----------------Sleep:{}".format(datetime.datetime.now(), sleep_time) + "------end")
             time.sleep(sleep_time)
         except Exception as e:
@@ -380,24 +443,24 @@ def insert_mysql(offer_dict_list, table_name, conn):
     insert_into_sql_s = ""
     datas = []
     try:
-        if offer_dict_list[0]:
+        if offer_dict_list and offer_dict_list[0]:
             keys = offer_dict_list[0].keys()
             for j in keys:
-                insert_into_sql = insert_into_sql + j+","
+                insert_into_sql = insert_into_sql + j + ","
                 insert_into_sql_s = insert_into_sql_s + "%s,"
             insert_into_sql = insert_into_sql.rstrip(",") + ") VALUES (" + insert_into_sql_s.rstrip(',') + ")"
             print insert_into_sql
-
+        else:
+            return
     except Exception as e:
-        print("FAIL to insert_into_sql {}".format(e))
+        print("Splicing insert_into_" + table_name + "_sql errors:{}".format(e))
 
     try:
         for i in offer_dict_list:
             data = tuple(i.values())
             datas.append(data)
-            print datas
     except Exception as e:
-        print("FAIL to insert_into_data {}".format(e))
+        print("Splicing insert_into_" + table_name + "_data errors:{}".format(e))
 
     try:
         with conn.cursor() as cursor:
@@ -405,4 +468,7 @@ def insert_mysql(offer_dict_list, table_name, conn):
             conn.commit()
             print("success to insert asin_dict to mysql")
     except Exception as e:
-        print("fail to insert asin_dict to mysql!{}".format(e))
+        print("INSERT " + table_name + " errors:{}".format(e), datas)
+
+
+product_detail_to_mysql("UK")
