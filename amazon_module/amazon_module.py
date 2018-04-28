@@ -7,67 +7,10 @@ import os
 import json
 import time
 
+USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36'
 #basic function
 def download_soup_by_url(url):
-    headers_list = [
-            {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36'},
-            {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:55.0) Gecko/20100101 Firefox/55.0'},
-            {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.93 Safari/537.36'},
-            {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.11 (KHTML, like Gecko) Ubuntu/11.10 Chromium/27.0.1453.93 Chrome/27.0.1453.93 Safari/537.36'},
-            {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.94 Safari/537.36'},
-            {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; .NET4.0C; .NET4.0E; .NET CLR 2.0.50727; .NET CLR 3.0.30729; .NET CLR 3.5.30729; InfoPath.3; rv:11.0)'},
-            {'User-Agent': 'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)'},
-            {'User-Agent': 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0)'},
-            {'User-Agent': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0)'},
-            {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; rv:2.0.1) Gecko/20100101 Firefox/4.0.1'},
-            {'User-Agent': 'Opera/9.80 (Macintosh; Intel Mac OS X 10.6.8; U; en) Presto/2.8.131 Version/11.11'},
-            {'User-Agent': 'Opera/9.80 (Windows NT 6.1; U; en) Presto/2.8.131 Version/11.11'},
-            {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_0) AppleWebKit/535.11 (KHTML, like Gecko) Chrome/17.0.963.56 Safari/535.11'},
-            {'User-Agent': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Maxthon 2.0)'},
-            {'User-Agent': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; TencentTraveler 4.0)'},
-            {'User-Agent': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)'},
-            {'User-Agent': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; The World)'},
-            {'User-Agent': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Trident/4.0; SE 2.X MetaSr 1.0; SE 2.X MetaSr 1.0; .NET CLR 2.0.50727; SE 2.X MetaSr 1.0)'},
-            {'User-Agent': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; 360SE)'},
-            {'User-Agent': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Avant Browser)'},
-            {'User-Agent': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)'}
-        ]
-    headers = random.choice(headers_list)
-    china_proxies_list = [
-            {'https': 'https://120.92.119.120:10010', },
-            {'https': 'https://39.134.108.91:80', },
-            {'https': 'https://120.92.88.202:10000', },
-            {'https': 'https://39.134.108.89:80', },
-            {'https': 'https://221.122.91.66:80', },
-            {'https': 'https://221.122.91.34:80', },
-            {'https': 'https://221.122.91.60:80', },
-            {'https': 'https://221.122.91.59:80', },
-            {'https': 'https://39.134.61.74:80', },
-            {'https': 'https://218.60.8.98:3129', },
-            {'https': 'https://180.168.184.179:53128', },
-            {'https': 'https://59.67.152.230:3128', },
-            {'https': 'https://123.56.75.209:3128', },
-            {'https': 'https://182.202.220.11:61234', },
-            {'https': 'https://218.60.8.99:3129', },
-            {'https': 'https://121.234.244.234:61234', },
-            {'https': 'https://223.93.139.174:1080', },
-            {'https': 'https://218.72.110.132:18118', },
-            {'https': 'https://223.241.118.196:18118', },
-            {'https': 'https://223.241.116.65:18118', },
-            {'https': 'https://60.166.194.55:61234', },
-            {'https': 'https://183.250.255.86:63000', },
-            {'https': 'https://119.27.177.169:80', },
-            {'https': 'https://118.212.137.133:31288', },
-            {'https': 'https://113.121.43.246:61234', },
-            {'https': 'https://114.215.95.188:3128', },
-            {'https': 'https://112.248.22.140:61234', },
-            {'https': 'https://1.196.161.172:9999', },
-            {'https': 'https://175.6.2.174:8088', },
-            {'https': 'https://223.145.230.60:6666', },
-            {'https': 'https://101.37.14.172:3128', },
-            {'https': 'https://219.135.164.245:3128', },
-
-    ]
+    headers = {'User-Agent': get_random_user_agent()}
     proxies = {'https': 'https://218.60.8.98:3129', }
     r = requests.get(url, headers=headers, proxies=proxies)
     # print("Downloading: r.status_code=", r.status_code)
@@ -79,8 +22,8 @@ def download_soup_by_url(url):
         print("Robot Check")
         sleep_time = time.sleep(random.choice([0.5, 1, 2, 3, 4]))
         print "try again sleep time :" + sleep_time
-        headers = random.choice(headers_list)
-        proxies = random.choice(china_proxies_list)
+        headers = {'User-Agent': get_random_user_agent()}
+        #TODO proxies = random.choice(china_proxies_list)
         r = requests.get(url, headers=headers, proxies=proxies)
 
         count -= 1
@@ -927,3 +870,29 @@ def index(asin, keyword):
     except:
         # print("not index")
         return None
+
+def get_random_user_agent():
+    """
+    Get a random user agent string.
+    :return: Random user agent string.
+    """
+    return random.choice(get_data('user_agents.txt', USER_AGENT))
+
+
+def get_data(filename, default=''):
+    """
+    Get data from a file
+    :param filename: filename
+    :param default: default value
+    :return: data
+    """
+    root_folder = os.path.dirname(__file__)
+    user_agents_file = os.path.join(
+        os.path.join(root_folder, '../res'), filename)
+    try:
+        with open(user_agents_file) as fp:
+            data = [_.strip() for _ in fp.readlines()]
+    except Exception as e:
+        print ("----------choice user agent error {}".format(e))
+        data = [default]
+    return data
