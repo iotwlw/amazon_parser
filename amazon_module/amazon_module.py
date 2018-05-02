@@ -1,3 +1,6 @@
+import logging
+
+import cchardet
 import requests
 from bs4 import BeautifulSoup
 import re
@@ -5,31 +8,67 @@ import random
 import csv
 import os
 import json
-import time
 
+from requests.exceptions import ProxyError, ChunkedEncodingError
+
+from proxy_control import ProxyControl
+
+logging.getLogger("urllib3").setLevel(logging.WARNING)
+logging.getLogger("chardet").setLevel(logging.WARNING)
+logging.getLogger("requests").setLevel(logging.WARNING)
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s: %(message)s')
+LOGGER = logging.getLogger('amazon_module')
 USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36'
-#basic function
+px = ProxyControl()
+
+
 def download_soup_by_url(url):
-    headers = {'User-Agent': get_random_user_agent()}
-    proxies = {'https': 'https://218.60.8.98:3129', }
-    r = requests.get(url, headers=headers, proxies=proxies)
-    # print("Downloading: r.status_code=", r.status_code)
-    # soup = BeautifulSoup(r.content, 'html5lib')
-    soup = BeautifulSoup(r.content, 'html.parser')
-
-    count = 9
-    while count > 0 and ("Robot Check" in soup.get_text()):
-        print("Robot Check")
-        sleep_time = time.sleep(random.choice([0.5, 1, 2, 3, 4]))
-        print "try again sleep time :" + sleep_time
+    try:
         headers = {'User-Agent': get_random_user_agent()}
-        #TODO proxies = random.choice(china_proxies_list)
-        r = requests.get(url, headers=headers, proxies=proxies)
+        requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
+        r = requests.get(url, headers=headers, proxies=px.proxies)
+        content = r.content
+        charset = cchardet.detect(content)
+        text = content.decode(charset['encoding'])
+        soup = BeautifulSoup(text, 'html.parser')
 
-        count -= 1
-        soup = BeautifulSoup(r.content, 'html.parser')
-
+        print("Downloading: r.status_code=", r.status_code)
+        if "Robot Check" in soup.get_text():
+            print("Robot Check Error")
+            soup = robot_check(url)
+    except ProxyError as e:
+        LOGGER.exception(e)
+        soup = robot_check(url)
+    except ChunkedEncodingError as e:
+        LOGGER.exception(e)
+        soup = robot_check(url)
+    except Exception as e2:
+        print("Requests Other Error {}".format(url))
+        LOGGER.exception(e2)
+        # TODO: ADD time record > 10 robot_check
     return soup
+
+
+def robot_check(url):
+    count = 9
+    while count > 0:
+        headers = {'User-Agent': get_random_user_agent()}
+        proxies = px.detect_proxy()
+        if proxies:
+            try:
+                r = requests.get(url, headers=headers, proxies=proxies)
+                content = r.content
+                charset = cchardet.detect(content)
+                text = content.decode(charset['encoding'])
+                soup = BeautifulSoup(text, 'html.parser')
+                return soup
+            except ProxyError as e:
+                LOGGER.exception(e)
+            except Exception as e2:
+                LOGGER.exception(e2)
+        count -= 1
+    raise ProxyError
+
 
 def url_to_asin(url):
     try:
