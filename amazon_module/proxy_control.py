@@ -18,7 +18,7 @@ class ProxyControl:
     """
 
     def __init__(self, proxies=None):
-        self.proxies = {'https': 'https://117.127.0.196:3128', }
+        self.proxies = None
 
     # 定义上下文管理器，连接后自动关闭连接
     @contextlib.contextmanager
@@ -35,7 +35,7 @@ class ProxyControl:
     def detect_proxy(self):
         with self.mysql() as cursor:
             try:
-                cursor.execute("SELECT * from proxys where score > 7 and (last_use is null or last_use < date_sub(now(), interval 2 hour))")
+                cursor.execute("SELECT * from proxys where score > 7 and (last_use is null or last_use < date_sub(now(), interval 2 hour)) ORDER by speed")
                 print "---------------------------detect_proxy---------------------------"
                 for proxy in cursor.fetchall():
                     ip = proxy['ip']
@@ -63,7 +63,7 @@ class ProxyControl:
         try:
             start = time.time()
             headers = {'user-agent': self.get_random_user_agent()}
-            r = requests.get(url='https://www.amazon.co.uk', headers=headers, proxies=proxies)
+            r = requests.get(url='https://www.amazon.com', headers=headers, proxies=proxies)
             r.encoding = chardet.detect(r.content)['encoding']
             if r.ok and len(r.content) > 500 and ("Robot Check" not in r.content):
                 speed = round(time.time() - start, 2)
