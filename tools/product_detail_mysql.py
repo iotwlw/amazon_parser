@@ -100,42 +100,44 @@ def asin_to_listing_info(asin, country=None):
     # Salesrank
     try:
         trs = soup.find(id="productDetails_detailBullets_sections1").find_all("tr")
-        for tr in trs:
-            try:
-                th = tr.find("th").get_text().strip()
-                if th == "Best Sellers Rank":
-                    spans = tr.find("span").find_all("span")
-                    num = 0
-                    for span in spans:
-                        try:
-                            span_text = span.get_text()
-                            spans_text = spans_text + span_text + "\n"
-                            ranking = re.search('#(\d|,)+', span_text)
-                            ranking = ranking.group()
-                            ranking = ranking.replace(',', '')
-                            ranking = ranking.replace('#', '')
+        if trs:
+            trs = trs.find_all("tr")
+            for tr in trs:
+                try:
+                    th = tr.find("th").get_text().strip()
+                    if th == "Best Sellers Rank":
+                        spans = tr.find("span").find_all("span")
+                        num = 0
+                        for span in spans:
+                            try:
+                                span_text = span.get_text()
+                                spans_text = spans_text + span_text + "\n"
+                                ranking = re.search('#(\d|,)+', span_text)
+                                ranking = ranking.group()
+                                ranking = ranking.replace(',', '')
+                                ranking = ranking.replace('#', '')
 
-                            rank_text_arr = span_text.split(' in ')
-                            rank_text = rank_text_arr[1]
-                            rank_text_arr = rank_text.split('(')
-                            rank_text = rank_text_arr[0]
+                                rank_text_arr = span_text.split(' in ')
+                                rank_text = rank_text_arr[1]
+                                rank_text_arr = rank_text.split('(')
+                                rank_text = rank_text_arr[0]
 
-                            num = num + 1
-                            rank_dict = {
-                                "detail_id": now,
-                                "rank_num": num,
-                                "rank_asin": asin,
-                                "rank_order": ranking,
-                                "rank_text": rank_text,
-                            }
-                            ranking_list.append(rank_dict)
-                        except Exception as e:
-                            print("Handling Salesrank string errors !: {}".format(e))
-                            pass
+                                num = num + 1
+                                rank_dict = {
+                                    "detail_id": now,
+                                    "rank_num": num,
+                                    "rank_asin": asin,
+                                    "rank_order": ranking,
+                                    "rank_text": rank_text,
+                                }
+                                ranking_list.append(rank_dict)
+                            except Exception as e:
+                                print("Handling Salesrank string errors !: {}".format(e))
+                                pass
 
-            except Exception as e:
-                print("Analyze Salesrank th errors!: {}".format(e))
-                pass
+                except Exception as e:
+                    print("Analyze Salesrank th errors!: {}".format(e))
+                    pass
     except Exception as e:
         print("Analyze Salesrank errors!: {}".format(e))
         pass
@@ -210,8 +212,9 @@ def asin_to_listing_info(asin, country=None):
     buy_money = 0.0
 
     try:
-        if soup.find(id="olp_feature_div").find("a"):
-            how_many_sellers = soup.find(id="olp_feature_div").find("a").get_text().strip()
+        olp_feature_div = soup.find(id="olp_feature_div")
+        if olp_feature_div and olp_feature_div.find("a"):
+            how_many_sellers = olp_feature_div.find("a").get_text().strip()
             if country:
                 follow_sell = how_many_sellers.split()
                 follow_num = follow_sell[0].strip()
