@@ -175,9 +175,13 @@ def asin_to_listing_info(asin, country=None):
             review_date_desc = review.find("span", {"data-hook": "review-author-timestamp"}).get_text()
             review_body = review.find("span", {"data-hook": "review-body-recent"}).get_text()
             review_date_desc_temp = review_date_desc.lstrip('Published ').rstrip(' ago')
-            review_date_desc_arr = review_date_desc_temp.split(' ')
-            review_date = review_date_desc_arr[0]
-            review_date_unit = review_date_desc_arr[1].rstrip('s')
+            if 'on ' in review_date_desc_temp:
+                review_date = '2'
+                review_date_unit = 'year'
+            else:
+                review_date_desc_arr = review_date_desc_temp.split(' ')
+                review_date = review_date_desc_arr[0]
+                review_date_unit = review_date_desc_arr[1].rstrip('s')
             #TODO:
             if review_index == 0:
                 review_last_desc = review_date_desc
