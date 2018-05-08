@@ -18,7 +18,7 @@ class ProxyControl:
     """
 
     def __init__(self, proxies=None):
-        self.proxies = {'https': 'https://39.134.68.9:80', }
+        self.proxies = None
 
     # 定义上下文管理器，连接后自动关闭连接
     @contextlib.contextmanager
