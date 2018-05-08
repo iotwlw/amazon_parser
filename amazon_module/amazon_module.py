@@ -9,7 +9,7 @@ import csv
 import os
 import json
 
-from requests.exceptions import ProxyError, ChunkedEncodingError
+from requests.exceptions import ProxyError, ChunkedEncodingError, ConnectionError
 
 from proxy_control import ProxyControl
 
@@ -42,9 +42,13 @@ def download_soup_by_url(url):
     except ChunkedEncodingError as e:
         LOGGER.exception(e)
         soup = robot_check(url)
+    except ConnectionError as e:
+        LOGGER.exception(e)
+        soup = robot_check(url)
     except Exception as e2:
         print("Requests Other Error {}".format(url))
         LOGGER.exception(e2)
+        soup = robot_check(url)
         # TODO: ADD time record > 10 robot_check
     return soup
 
