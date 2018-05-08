@@ -223,7 +223,7 @@ def asin_to_listing_info(asin, country=None):
                 follow_type = follow_sell[0].strip()
                 follow_num = follow_sell[1].split(')')
                 buy_money = follow_num[1].split('$')
-                buy_money = buy_money[1].strip()
+                buy_money = buy_money[1].strip().replace(',', '').rstrip(' +')
                 follow_num = follow_num[0].strip()
 
     except Exception as e:
@@ -435,7 +435,7 @@ def update_listing_google(data_asins):
     #        -1 error data
     #        2  handled by Amazon program
     #        11 first filter by under 30 review_num and under 4.0 review_value
-    update_sql = "UPDATE listing_google set state = 2 where asin = %s"
+    update_sql = "UPDATE listing_google_us set state = 2 where asin = %s"
 
     try:
         with mysql() as cursor:
