@@ -35,7 +35,7 @@ class ProxyControl:
     def detect_proxy(self):
         with self.mysql() as cursor:
             try:
-                cursor.execute("SELECT * from proxys where score > 7 and (last_use is null or last_use < date_sub(now(), interval 2 hour)) ORDER by speed")
+                cursor.execute("SELECT * from proxys where score > 5 and (last_use is null or last_use < date_sub(now(), interval 2 hour)) ORDER by speed")
                 print "---------------------------detect_proxy---------------------------"
                 for proxy in cursor.fetchall():
                     ip = proxy['ip']
