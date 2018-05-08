@@ -173,40 +173,41 @@ def asin_to_listing_info(asin, country=None):
         pass
 
     try:
-        review_list = soup.find(id="most-recent-reviews-content").find_all("div", {"data-hook": "recent-review"})
-
-        for review_index, review in enumerate(review_list):
-            review_title = review.find("span", {"data-hook": "review-title-recent"}).get_text()
-            review_star_rating = review.find("i", {"data-hook": "review-star-rating-recent"}).get_text()
-            review_author_url = review.find("a", {"class": "a-profile"})["href"]
-            review_author = review.find("span", {"class": "a-profile-name"}).get_text()
-            review_date_desc = review.find("span", {"data-hook": "review-author-timestamp"}).get_text()
-            review_body = review.find("span", {"data-hook": "review-body-recent"}).get_text()
-            review_date_desc_temp = review_date_desc.lstrip('Published ').rstrip(' ago')
-            if 'on ' in review_date_desc_temp:
-                review_date = '2'
-                review_date_unit = 'year'
-            else:
-                review_date_desc_arr = review_date_desc_temp.split(' ')
-                review_date = review_date_desc_arr[0]
-                review_date_unit = review_date_desc_arr[1].rstrip('s')
-            #TODO:
-            if review_index == 0:
-                review_last_desc = review_date_desc
-                review_last_time = review_date
-                review_last_unit = review_date_unit
-            review_dict = {
-                "review_asin": asin,
-                "review_title": review_title,
-                "review_star": review_star_rating.rstrip(" out of 5 stars"),
-                "review_author": review_author,
-                "review_author_url": review_author_url,
-                "review_date": review_date,
-                "review_date_unit": review_date_unit,
-                "review_date_desc": review_date_desc,
-                "review_body": review_body,
-            }
-            review_dict_list.append(review_dict)
+        review_list = soup.find(id="most-recent-reviews-content")
+        if review_list and review_list.find_all("div", {"data-hook": "recent-review"}):
+            review_list = review_list.find_all("div", {"data-hook": "recent-review"})
+            for review_index, review in enumerate(review_list):
+                review_title = review.find("span", {"data-hook": "review-title-recent"}).get_text()
+                review_star_rating = review.find("i", {"data-hook": "review-star-rating-recent"}).get_text()
+                review_author_url = review.find("a", {"class": "a-profile"})["href"]
+                review_author = review.find("span", {"class": "a-profile-name"}).get_text()
+                review_date_desc = review.find("span", {"data-hook": "review-author-timestamp"}).get_text()
+                review_body = review.find("span", {"data-hook": "review-body-recent"}).get_text()
+                review_date_desc_temp = review_date_desc.lstrip('Published ').rstrip(' ago')
+                if 'on ' in review_date_desc_temp:
+                    review_date = '2'
+                    review_date_unit = 'year'
+                else:
+                    review_date_desc_arr = review_date_desc_temp.split(' ')
+                    review_date = review_date_desc_arr[0]
+                    review_date_unit = review_date_desc_arr[1].rstrip('s')
+                #TODO:
+                if review_index == 0:
+                    review_last_desc = review_date_desc
+                    review_last_time = review_date
+                    review_last_unit = review_date_unit
+                review_dict = {
+                    "review_asin": asin,
+                    "review_title": review_title,
+                    "review_star": review_star_rating.rstrip(" out of 5 stars"),
+                    "review_author": review_author,
+                    "review_author_url": review_author_url,
+                    "review_date": review_date,
+                    "review_date_unit": review_date_unit,
+                    "review_date_desc": review_date_desc,
+                    "review_body": review_body,
+                }
+                review_dict_list.append(review_dict)
     except Exception as e:
         print "analyze review errors:{}".format(e)
         pass
