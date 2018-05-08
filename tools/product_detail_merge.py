@@ -64,11 +64,11 @@ def asin_to_listing_info(asin, country=None):
     try:
         if soup.find(id="price"):
             price = soup.find(id="price").find("span").get_text()
-            price = re.search('(\d\.\d*)', price)
+            price = re.search('(\d*\.\d*)', price)
             price = price.group()
         if soup.find(id="priceblock_ourprice"):
             price = soup.find(id="priceblock_ourprice").get_text()
-            price = re.search('(\d\.\d*)', price)
+            price = re.search('(\d*\.\d*)', price)
             price = price.group()
     except:
         pass

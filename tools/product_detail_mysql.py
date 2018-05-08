@@ -58,11 +58,11 @@ def asin_to_listing_info(asin, country=None):
     try:
         if soup.find(id="price"):
             price = soup.find(id="price").find("span").get_text()
-            price = re.search('(\d\.\d*)', price)
+            price = re.search('(\d*\.\d*)', price)
             price = price.group()
         if soup.find(id="priceblock_ourprice"):
             price = soup.find(id="priceblock_ourprice").get_text()
-            price = re.search('(\d\.\d*)', price)
+            price = re.search('(\d*\.\d*)', price)
             price = price.group()
     except:
         pass
@@ -217,7 +217,7 @@ def asin_to_listing_info(asin, country=None):
                 follow_type = follow_sell[0].strip()
                 follow_num = follow_sell[1].split(')')
                 buy_money = follow_num[1].split('$')
-                buy_money = buy_money[1].strip()
+                buy_money = buy_money[1].strip().replace(',', '').rstrip(' +')
                 follow_num = follow_num[0].strip()
 
     except Exception as e:
