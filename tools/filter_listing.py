@@ -1,15 +1,9 @@
 # ! /usr/bin/env python
 # -*- coding:utf-8 -*-
-# __author__ = "TKQ"
-import os
-import random
-import time
-
 import pymysql
 import contextlib
 import datetime
 import product_detail_merge as merge
-
 
 
 # 定义上下文管理器，连接后自动关闭连接
@@ -29,7 +23,7 @@ def mysql(host='127.0.0.1', port=3306, user='root', passwd='P@ssw0rd', db='amazo
 def filter_listing():
     with mysql() as cursor:
         try:
-            row_count = cursor.execute("select DISTINCT asin from listing_google where state = 0")
+            row_count = cursor.execute("select DISTINCT asin from listing_google_us where state = 0 and review_num >= 30 and  review_value >= 3.6 and asin not in (SELECT asin from merge_product_detail)")
             print "---------------------------ALL ASIN:"+str(row_count)+"---------------------------"
             data_asin = []
             for row in cursor.fetchall():
