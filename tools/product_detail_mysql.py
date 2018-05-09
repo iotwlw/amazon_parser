@@ -99,7 +99,7 @@ def asin_to_listing_info(asin, country=None):
 
     # Salesrank
     try:
-        trs = soup.find(id="productDetails_detailBullets_sections1").find_all("tr")
+        trs = soup.find(id="productDetails_detailBullets_sections1")
         if trs:
             trs = trs.find_all("tr")
             for tr in trs:
@@ -167,7 +167,7 @@ def asin_to_listing_info(asin, country=None):
         pass
 
     try:
-        review_list = soup.find(id="most-recent-reviews-content").find_all("div", {"data-hook": "recent-review"})
+        review_list = soup.find(id="most-recent-reviews-content")
         if review_list and review_list.find_all("div", {"data-hook": "recent-review"}):
             review_list = review_list.find_all("div", {"data-hook": "recent-review"})
             for review_index, review in enumerate(review_list):
