@@ -477,6 +477,3 @@ def insert_mysql(offer_dict_list, table_name, conn):
             print("success to insert asin_dict to mysql")
     except Exception as e:
         print("INSERT " + table_name + " errors:{}".format(e), datas)
-
-
-product_detail_to_mysql("UK")
