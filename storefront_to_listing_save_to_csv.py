@@ -11,8 +11,8 @@ class Storefront_to_listing():
     def __init__(self):
 
         # change to yours
-        self.storefront_url = "https://www.amazon.com/s?marketplaceID=ATVPDKIKX0DER&me=A294P4X9EWVXLJ&merchant=A294P4X9EWVXLJ&redirect=true"
-        self.store_name = "anker"
+        self.storefront_url = "https://www.amazon.com/s?marketplaceID=ATVPDKIKX0DER&me=A3I7K5MJPCIZH9&merchant=A3I7K5MJPCIZH9&redirect=true"
+        self.store_name = "Sprtjoy"
         self.max_page = 5
 
         # don't change
@@ -21,6 +21,7 @@ class Storefront_to_listing():
         self.picture_folder = ""
         self.picture_url = ""
         self.asin = ""
+        self.asin_list = []
         self.listing_info_dict = dict()
         self.best_seller_badge = " "
 
@@ -31,10 +32,11 @@ class Storefront_to_listing():
         asin_list = []
         for index, li in enumerate(lis):
             self.asin = li["data-asin"]
-            self.listing_info_dict = self.asin_to_listing_info()
-            self.listing_info_dict_to_csv_file()
+            # self.listing_info_dict = self.asin_to_listing_info()
+            # self.listing_info_dict_to_csv_file()
             asin_list.append(self.asin)
-
+            self.asin_list.append(self.asin)
+            print (self.asin)
             # best seller badge
             self.best_seller_badge = ""
             try:
@@ -81,7 +83,7 @@ class Storefront_to_listing():
 
         if not os.path.isfile(csv_file_path):
             try:
-                with open(csv_file_path, 'w', encoding='utf8', newline='') as f:
+                with open(csv_file_path, 'w') as f:
                     f_csv = csv.DictWriter(f, headers)
                     f_csv.writeheader()
                     print("success to write csv header!")
@@ -89,7 +91,7 @@ class Storefront_to_listing():
                 print("fail to write csv header!")
 
         try:
-            with open(csv_file_path, 'a+', encoding='utf8', newline='') as f:
+            with open(csv_file_path, 'a+') as f:
                 f_csv = csv.DictWriter(f, headers)
                 f_csv.writerow(self.listing_info_dict)
                 print("success to write csv content!")
@@ -380,11 +382,21 @@ class Storefront_to_listing():
 
             return self.listing_info_dict
 
+    def export_asin_of_store(self):
+        store_ids = open('./config/STORE', 'r')
+        for store_id in store_ids:
+            self.start(store_id)
 
-    def start(self):
+        fileObject = open('./store/asin_of_store.txt', 'w')
+        for ip in self.asin_list:
+            fileObject.write(ip)
+            fileObject.write('\n')
+        fileObject.close()
+
+    def start(self, store_url):
         try:
             # get storefront_id
-            storefront_url_temp = self.storefront_url
+            storefront_url_temp = store_url
             storefront_id = ""
             try:
                 storefront_id = re.search(r"seller=(.*?)&", storefront_url_temp).group(1)
@@ -397,35 +409,10 @@ class Storefront_to_listing():
             print("storefront_id:", storefront_id)
             self.storefront_url = "https://www.amazon.com/shops/" + storefront_id + "?ref_=v_sp_storefront"
 
-            # print path of csv_folder, picture_folder
-            print("storefront_url:", self.storefront_url)
-            store_name_with_underline = "_".join(self.store_name.split())
-            self.csv_folder = "store/" + store_name_with_underline + "/"
-            print("csv_folder:", self.csv_folder)
-            self.csv_file_name = store_name_with_underline + ".csv"
-            self.picture_folder = self.csv_folder + "pictures/"
-            print("picture_folder:", self.picture_folder)
-            print("*********************")
-            print("*********************")
-
-            # create csv folder
-            try:
-                if not os.path.exists(self.csv_folder):
-                    os.makedirs(self.csv_folder)
-                    print("success to create csv_folder folder")
-            except:
-                print("fail to create csv_folder folder")
-
-             # create picture folder
-            try:
-                if not os.path.exists(self.picture_folder):
-                    os.makedirs(self.picture_folder)
-                    print("success to create picture folder")
-            except:
-                print("fail to create picture folder")
 
             # main
             store_url_list = self.storefront_url_to_store_url_list()
+            all_asin = []
             for index, store_url in enumerate(store_url_list):
                 print("store_url:", store_url)
                 self.store_url_to_asin_list(store_url)
@@ -434,4 +421,4 @@ class Storefront_to_listing():
 
 #main function
 storefront_to_listing = Storefront_to_listing()
-storefront_to_listing.start()
+storefront_to_listing.export_asin_of_store()
