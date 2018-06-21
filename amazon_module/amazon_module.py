@@ -8,6 +8,7 @@ import random
 import csv
 import os
 import json
+import lxml
 
 from requests.exceptions import ProxyError, ChunkedEncodingError, ConnectionError
 
@@ -26,11 +27,14 @@ def download_soup_by_url(url):
     try:
         headers = {'User-Agent': get_random_user_agent()}
         requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
-        r = requests.get(url, headers=headers, proxies=px.proxies)
+        r = requests.get(url, headers=headers, proxies=px.proxies, timeout=30)
         content = r.content
         charset = cchardet.detect(content)
-        text = content.decode(charset['encoding'])
-        soup = BeautifulSoup(text, 'html.parser')
+        if charset and charset['encoding']:
+            text = content.decode(charset['encoding'])
+        else:
+            text = content.decode('UTF-8')
+        soup = BeautifulSoup(text, 'lxml')
 
         print("Downloading: r.status_code=", r.status_code)
         if "Robot Check" in soup.get_text():
