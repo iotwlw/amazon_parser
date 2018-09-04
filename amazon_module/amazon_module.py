@@ -36,7 +36,7 @@ def download_soup_by_url(url):
             text = content.decode('UTF-8')
         soup = BeautifulSoup(text, 'lxml')
 
-        print("Downloading: r.status_code=", r.status_code)
+        # print("Downloading: r.status_code=", r.status_code)
         if "Robot Check" in soup.get_text():
             print("Robot Check Error")
             soup = robot_check(url)
