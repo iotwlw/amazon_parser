@@ -226,6 +226,8 @@ def asin_to_listing_info(asin, country=None):
                 follow_num = follow_sell[1].split(')')
                 buy_money = follow_num[1].split('$')
                 buy_money = buy_money[1].strip().replace(',', '').rstrip(' +')
+                buy_money = re.search('(\d*\.\d*)', buy_money)
+                buy_money = buy_money.group()
                 follow_num = follow_num[0].strip()
 
     except Exception as e:
@@ -367,7 +369,7 @@ def insert_data_to_mysql(asin_dict, table_name, conn):
 
 
 def asin_to_offer_listing(asin, now, country=None):
-    print("asin: ", asin)
+    print("offer asin: ", asin)
     url = "https://www.amazon.com/gp/offer-listing/" + asin + "/dp_olp_new_mbc?ie=UTF8&condition=new"
     if country:
         url = "https://www.amazon.co.uk/gp/offer-listing/" + asin + "/dp_olp_new_mbc?ie=UTF8&condition=new"
@@ -388,7 +390,7 @@ def asin_to_offer_listing(asin, now, country=None):
                 span_price = div.find("span", class_="a-size-large a-color-price olpOfferPrice a-text-bold")
                 if span_price:
                     store_price = span_price.get_text().strip()
-                    store_price = re.search('(\d\.\d*)', store_price)
+                    store_price = re.search('(\d*\.\d*)', store_price)
                     store_price = store_price.group()
                 num = num + 1
                 offer_dict = {
@@ -399,8 +401,6 @@ def asin_to_offer_listing(asin, now, country=None):
                     "offer_price": store_price,
                     "offer_url": store_url,
                 }
-                print "--------------------------------------------------------------------------------------------"
-                print offer_dict
                 offering_list.append(offer_dict)
 
 
@@ -411,7 +411,7 @@ def asin_to_offer_listing(asin, now, country=None):
 
 
 def product_detail_to_mysql(country=None):
-    conn = pymysql.connect(db_config['host'], db_config['username'], db_config['password'],)
+    conn = pymysql.connect(db_config['host'], db_config['username'], db_config['password'], charset=db_config['charset'])
     cursor = conn.cursor()
 
     # create datebase
@@ -438,7 +438,7 @@ def product_detail_to_mysql(country=None):
             insert_data_to_mysql(listing_info_dict, table_name, conn)
             insert_mysql(ranking_list, "product_salesrank", conn)
             insert_mysql(offering_list, "product_offer", conn)
-            sleep_time = random.randint(2, 20)
+            sleep_time = random.randint(2, 10)
             print ("{}:----------------Sleep:{}".format(datetime.datetime.now(), sleep_time) + "------end")
             time.sleep(sleep_time)
         except Exception as e:
@@ -477,3 +477,6 @@ def insert_mysql(offer_dict_list, table_name, conn):
             print("success to insert asin_dict to mysql")
     except Exception as e:
         print("INSERT " + table_name + " errors:{}".format(e), datas)
+
+
+# asin_to_listing_info('B07B7N91VN',"")

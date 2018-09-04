@@ -1,3 +1,5 @@
+# ! /usr/bin/env python
+# -*- coding:utf-8 -*-
 from amazon_module import amazon_module
 import re
 import os

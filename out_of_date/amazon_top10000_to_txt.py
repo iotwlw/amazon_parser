@@ -12,7 +12,7 @@ top100_url = "https://www.amazon.com/Best-Sellers/zgbs/ref=zg_bs_unv_e_0_e_1"
 soup = amazon_module.download_soup_by_url(top100_url)
 
 lis = soup.find(id="zg_browseRoot").find("ul").find_all("li")
-for li in lis[29:30]:
+for li in lis[25:26]:
     print("li: ", li.get_text().strip())
     # print(li.a['href'])
     node_dict[li.get_text().strip()] = "none"
@@ -75,39 +75,39 @@ print("node_url_dict: ", node_url_dict)
 
 print("len of node_dict: ", len(node_dict))
 print("len of node_url_dict: ", len(node_url_dict))
-
-start_url = "https://www.amazon.com/Best-Sellers-Pet-Supplies-Dry-Dog-Food/zgbs/pet-supplies/2975360011/ref=zg_bs_nav_petsupplies_3_2975359011"
-new_url_list = []
-new_url_list.append(start_url)
-
-asin_set = set()
-new_url_list = node_url_dict.values()
-old_url_set = set()
-for url in new_url_list:
-    if url not in old_url_set:
-        old_url_set.add(url)
-        for i in range(5):
-            try:
-                page_url = re.sub(r"ref=zg(.*)", "ref=zg_bs_pg_" + str(i+1) + "?_encoding=UTF8&pg=" + str(i+1), url)
-                print(page_url)
-                page_soup = amazon_module.download_soup_by_url(page_url)
-                page_lis = page_soup.find(id="zg_centerListWrapper").find_all("div", class_="zg_itemImmersion")
-                for page_li in page_lis:
-                    try:
-                        link = page_li.find("a")['href']
-                        asin = re.findall(r"dp/(.*?)/ref", link)[0]
-                        # print(asin)
-                        asin_set.add(asin)
-                    except:
-                        pass
-            except:
-                pass
-print(asin_set)
-print(len(asin_set))
-
-with open("pet.txt", "w") as f:
-    for asin in asin_set:
-        f.write(asin + "\n")
+#
+# start_url = "https://www.amazon.com/Best-Sellers-Pet-Supplies-Dry-Dog-Food/zgbs/pet-supplies/2975360011/ref=zg_bs_nav_petsupplies_3_2975359011"
+# new_url_list = []
+# new_url_list.append(start_url)
+#
+# asin_set = set()
+# new_url_list = node_url_dict.values()
+# old_url_set = set()
+# for url in new_url_list:
+#     if url not in old_url_set:
+#         old_url_set.add(url)
+#         for i in range(5):
+#             try:
+#                 page_url = re.sub(r"ref=zg(.*)", "ref=zg_bs_pg_" + str(i+1) + "?_encoding=UTF8&pg=" + str(i+1), url)
+#                 print(page_url)
+#                 page_soup = amazon_module.download_soup_by_url(page_url)
+#                 page_lis = page_soup.find(id="zg_centerListWrapper").find_all("div", class_="zg_itemImmersion")
+#                 for page_li in page_lis:
+#                     try:
+#                         link = page_li.find("a")['href']
+#                         asin = re.findall(r"dp/(.*?)/ref", link)[0]
+#                         # print(asin)
+#                         asin_set.add(asin)
+#                     except:
+#                         pass
+#             except:
+#                 pass
+# print(asin_set)
+# print(len(asin_set))
+#
+# with open("pet.txt", "w") as f:
+#     for asin in asin_set:
+#         f.write(asin + "\n")
 
 def asin_to_listing_info(asin, index):
 

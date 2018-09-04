@@ -1,3 +1,5 @@
+
+# -*- coding:utf-8 -*-
 from amazon_module import amazon_module
 
 keyword_list = [

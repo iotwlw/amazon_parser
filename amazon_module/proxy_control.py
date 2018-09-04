@@ -18,7 +18,7 @@ class ProxyControl:
     """
 
     def __init__(self, proxies=None):
-        self.proxies = None
+        self.proxies = {'https': 'https://218.60.8.98:3129' }
 
     # 定义上下文管理器，连接后自动关闭连接
     @contextlib.contextmanager
@@ -35,7 +35,7 @@ class ProxyControl:
     def detect_proxy(self):
         with self.mysql() as cursor:
             try:
-                cursor.execute("SELECT * from proxys where score > 5 and (last_use is null or last_use < date_sub(now(), interval 2 hour)) ORDER by speed")
+                cursor.execute("SELECT * from proxys where score > 6 and (last_use is null or last_use < date_sub(now(), interval 2 hour)) ORDER by score desc limit 100 ")
                 print "---------------------------detect_proxy---------------------------"
                 for proxy in cursor.fetchall():
                     ip = proxy['ip']
@@ -63,7 +63,7 @@ class ProxyControl:
         try:
             start = time.time()
             headers = {'user-agent': self.get_random_user_agent()}
-            r = requests.get(url='https://www.amazon.com', headers=headers, proxies=proxies)
+            r = requests.get(url='https://www.amazon.com', headers=headers, proxies=proxies, timeout=30)
             r.encoding = chardet.detect(r.content)['encoding']
             if r.ok and len(r.content) > 500 and ("Robot Check" not in r.content):
                 speed = round(time.time() - start, 2)
@@ -108,6 +108,7 @@ class ProxyControl:
 
     def update_proxy(self, proxy, cursor):
         update_sql = "UPDATE proxys set score = '%(score)s',speed = '%(speed)s'  where ip = '%(ip)s' and port = '%(port)s'" % proxy
+        print update_sql
         try:
             row_count = cursor.execute(update_sql)
             print("UPDATE proxy {} success:", row_count)

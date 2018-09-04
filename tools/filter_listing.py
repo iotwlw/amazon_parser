@@ -23,7 +23,7 @@ def mysql(host='127.0.0.1', port=3306, user='root', passwd='P@ssw0rd', db='amazo
 def filter_listing():
     with mysql() as cursor:
         try:
-            row_count = cursor.execute("select DISTINCT asin from listing_google_us where state = 0 and review_num >= 30 and  review_value >= 3.6 and asin not in (SELECT asin from merge_product_detail)")
+            row_count = cursor.execute("select DISTINCT asin from listing_google_us where state = 0 and review_num >= 80 and review_value >= 3.8 and insert_datetime > '2018-08-07' and asin not in (SELECT asin from merge_product_detail)")
             print "---------------------------ALL ASIN:"+str(row_count)+"---------------------------"
             data_asin = []
             for row in cursor.fetchall():
@@ -35,7 +35,7 @@ def filter_listing():
                     merge.insert_mysql(offering_list, "merge_product_offer")
                     merge.insert_mysql(review_dict_list, "merge_product_review")
                     data_asin.append(asin)
-            merge.update_listing_google(data_asin)
+            # merge.update_listing_google(data_asin)
         except Exception as e:
             # os.system('start G:\911S5\ProxyTool\AutoProxyTool.exe  -changeproxy/US')
             merge.update_listing_google(data_asin)
