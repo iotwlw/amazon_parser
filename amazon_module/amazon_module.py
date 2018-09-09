@@ -9,6 +9,8 @@ import csv
 import os
 import json
 import lxml
+import subprocess
+import time
 
 from requests.exceptions import ProxyError, ChunkedEncodingError, ConnectionError
 
@@ -27,7 +29,7 @@ def download_soup_by_url(url):
     try:
         headers = {'User-Agent': get_random_user_agent()}
         requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
-        r = requests.get(url, headers=headers, proxies=px.proxies, timeout=30)
+        r = requests.get(url, headers=headers, timeout=20)
         content = r.content
         charset = cchardet.detect(content)
         if charset and charset['encoding']:
@@ -39,21 +41,11 @@ def download_soup_by_url(url):
         # print("Downloading: r.status_code=", r.status_code)
         if "Robot Check" in soup.get_text():
             print("Robot Check Error")
-            soup = robot_check(url)
-    except ProxyError as e:
-        LOGGER.exception(e)
-        soup = robot_check(url)
-    except ChunkedEncodingError as e:
-        LOGGER.exception(e)
-        soup = robot_check(url)
-    except ConnectionError as e:
-        LOGGER.exception(e)
-        soup = robot_check(url)
+            raise ProxyError
+
     except Exception as e2:
-        print("Requests Other Error {}".format(url))
-        LOGGER.exception(e2)
-        soup = robot_check(url)
-        # TODO: ADD time record > 10 robot_check
+        print("Requests Other Error {}".format(e2))
+        raise ProxyError
     return soup
 
 
@@ -943,3 +935,21 @@ def get_data(filename, default=''):
         print ("----------choice user agent error {}".format(e))
         data = [default]
     return data
+
+
+def change_ip_for_vps():
+    try:
+        subprocess.Popen('pppoe-stop', shell=True, stdout=subprocess.PIPE)
+        time.sleep(2)
+        subprocess.Popen('pppoe-start', shell=True, stdout=subprocess.PIPE)
+        time.sleep(5)
+        pppoe_restart = subprocess.Popen('pppoe-status', shell=True, stdout=subprocess.PIPE)
+        pppoe_restart.wait()
+        pppoe_log = pppoe_restart.communicate()[0]
+        adsl_ip = re.findall(r'inet (.+?) peer ', pppoe_log)[0]
+        LOGGER.info('[*] New ip address : ' + adsl_ip)
+        subprocess.Popen('python2 filter_listing.py', shell=True, stdout=subprocess.PIPE)
+        return True
+    except Exception, e:
+        print e
+        change_ip_for_vps()

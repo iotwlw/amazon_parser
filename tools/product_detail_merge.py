@@ -25,7 +25,7 @@ def mysql(host='127.0.0.1', port=3306, user='root', passwd='P@ssw0rd', db='amazo
 
 def asin_to_listing_info(asin, country=None):
     now = int(time.time())
-    print("asin: ", asin)
+    # print("asin: ", asin)
     url = "https://www.amazon.com/dp/" + asin
     if country:
         url = "https://www.amazon.co.uk/dp/" + asin
@@ -399,10 +399,10 @@ def insert_data_to_mysql(asin_dict, table_name):
                 data = (id, asin, insert_datetime, url, brand, title, variation_name, price, sold_by, how_many_sellers,
                         review_num, review_value, qa_num, follow_type, follow_num, buy_money, spans_text,
                         review_last_time, availability, aplus, review_last_unit, review_last_desc, brand_url)
-                print("{}:".format(insert_datetime), insert_into_sql)
+                # print("{}:".format(insert_datetime), insert_into_sql)
                 cursor.execute(insert_into_sql % data)
         except Exception as e:
-            print("INSERT " + table_name + " errors:{}".format(e), data)
+            print(insert_into_sql + " errors:{}".format(e), data)
     except Exception as e:
         print("INSERT " + table_name + " errors!!{}".format(e))
 
@@ -418,7 +418,7 @@ def insert_mysql(offer_dict_list, table_name):
                 insert_into_sql = insert_into_sql + j + ","
                 insert_into_sql_s = insert_into_sql_s + "%s,"
             insert_into_sql = insert_into_sql.rstrip(",") + ") VALUES (" + insert_into_sql_s.rstrip(',') + ")"
-            print insert_into_sql
+            # print insert_into_sql
         else:
             return
     except Exception as e:
@@ -448,7 +448,7 @@ def update_listing_google(data_asins):
     try:
         with mysql() as cursor:
             row_count = cursor.executemany(update_sql, data_asins)
-            print("UPDATE listing_google {}/{} success:", row_count, len(data_asins))
+            # print("UPDATE listing_google {}/{} success:", row_count, len(data_asins))
     except Exception as e:
         print("UPDATE listing_google errors:{}".format(e), data_asins)
 
