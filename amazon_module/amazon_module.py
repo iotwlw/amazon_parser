@@ -29,7 +29,7 @@ def download_soup_by_url(url):
     try:
         headers = {'User-Agent': get_random_user_agent()}
         requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
-        r = requests.get(url, headers=headers, timeout=20)
+        r = requests.get(url, headers=headers, proxies=px.proxies, timeout=30)
         content = r.content
         charset = cchardet.detect(content)
         if charset and charset['encoding']:
@@ -41,11 +41,21 @@ def download_soup_by_url(url):
         # print("Downloading: r.status_code=", r.status_code)
         if "Robot Check" in soup.get_text():
             print("Robot Check Error")
-            raise ProxyError
-
+            soup = robot_check(url)
+    except ProxyError as e:
+        LOGGER.exception(e)
+        soup = robot_check(url)
+    except ChunkedEncodingError as e:
+        LOGGER.exception(e)
+        soup = robot_check(url)
+    except ConnectionError as e:
+        LOGGER.exception(e)
+        soup = robot_check(url)
     except Exception as e2:
-        print("Requests Other Error {}".format(e2))
-        raise ProxyError
+        print("Requests Other Error {}".format(url))
+        LOGGER.exception(e2)
+        soup = robot_check(url)
+        # TODO: ADD time record > 10 robot_check
     return soup
 
 
