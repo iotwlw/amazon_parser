@@ -1,3 +1,4 @@
+# encoding: utf-8
 # 根据asin爬取前几页的review信息（review标题，内容，作者，星星数，profile链接，留review时间等等）；
 # 根据profile链接爬取客户信息，如简评，facebook，youtube等等（如果客户有信息的话）；
 # profile里的邮箱暂时获取不到，需要登录亚马逊买家账号才可以看到邮箱（如果客户有添加邮箱的话）；
@@ -17,7 +18,7 @@ class Asin_to_reviews():
     def __init__(self):
         # 这里填你要爬取得ASIN，注意英文引号，英文逗号，每行必须左对齐！
         self.asin_list = [
-            "B071GBGVSQ",
+            "B07P4CHT85",
         ]
         # 这里填每个ASIN里review最大爬取页数
         self.max_page = 30

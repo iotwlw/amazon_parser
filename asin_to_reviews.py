@@ -17,19 +17,19 @@ class Asin_to_reviews():
     def __init__(self):
         # 这里填你要爬取得ASIN，注意英文引号，英文逗号，每行必须左对齐！
         self.asin_list = [
-            "B07B8L8J4Q",
+            "B07P4CHT85",
             # "B00196P2O8",
         ]
         # 这里填每个ASIN里review最大爬取页数
         self.max_page = 40
         # avp_only_reviews表示爬取真实用户，all_reviews表示爬取所有
-        self.reviewer_type = "all_reviews"
+        self.reviewer_type = "avp_only_reviews"
         # recent表示爬取最近时间的review，top表示爬取默认排名高的review
         self.top_or_recent = "recent"
         # all代表所有星级，five_star 代表好评，critical代表差评
         self.all_or_positive_or_critical = "five_star"
         # 防止爬取太频繁导致亚马逊买家页面不能访问，每爬取一个页面，休息的时间秒数
-        self.sleep_time = 1
+        self.sleep_time = random.randint(0, 3)
         # 下面的不用更改
         self.reviews_dict_list = []
         self.csv_file_name = ""
