@@ -66,7 +66,7 @@ def robot_check(url):
         proxies = px.detect_proxy()
         if proxies:
             try:
-                r = requests.get(url, headers=headers, proxies=proxies)
+                r = requests.get(url, headers=headers, proxies=proxies, timeout=30)
                 content = r.content
                 charset = cchardet.detect(content)
                 text = content.decode(charset['encoding'])
